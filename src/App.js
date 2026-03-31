@@ -15,6 +15,9 @@ const SOCIAL_LINKS = {
   tiktok: "https://tiktok.com/@aiconziogio"
 };
 
+// Zio Gio's real photo
+const ZIO_GIO_PHOTO = "https://customer-assets.emergentagent.com/job_uncle-gio-travels/artifacts/gkck3070_hf_20260331_220644_7113f2c9-864d-4462-ae50-5eb5b049df26.png";
+
 // TikTok Icon
 const TikTokIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -96,7 +99,7 @@ const Navigation = () => {
           <Link to="/" data-testid="logo-link" className="flex items-center gap-3">
             <Terminal size={20} className="text-cyan-500" />
             <span className="font-terminal text-lg tracking-tight">
-              <span className="text-cyan-500">{'>'}</span> UNCLE_GIO
+              <span className="text-cyan-500">{'>'}</span> ZIO_GIO
             </span>
           </Link>
 
@@ -262,25 +265,25 @@ const AboutSection = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="vintage-frame">
-              <div className="relative overflow-hidden aspect-[3/4] crt-effect">
+              <div className="relative overflow-hidden aspect-square crt-effect">
                 <img
-                  src="https://images.unsplash.com/photo-1724627561609-9cd3facba8d4?w=800"
-                  alt="Uncle Gio con fotocamera vintage"
-                  className="w-full h-full object-cover sepia-vintage"
+                  src={ZIO_GIO_PHOTO}
+                  alt="Zio Gio nel suo studio di content creation"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end ai-overlay">
                   <div className="bg-stone-950/80 px-3 py-2 border border-cyan-500/50">
-                    <p className="hex-code">ID: UG_001</p>
-                    <p className="font-terminal text-xs text-cyan-400">SUBJECT: UNCLE_GIO</p>
+                    <p className="hex-code">ID: ZG_001</p>
+                    <p className="font-terminal text-xs text-cyan-400">SUBJECT: ZIO_GIO</p>
                   </div>
                   <div className="bg-stone-950/80 px-3 py-2 border border-amber-500/50">
-                    <p className="font-terminal text-xs text-amber-400">MATCH: 99.7%</p>
+                    <p className="font-terminal text-xs text-amber-400">NAPOLI_IT</p>
                   </div>
                 </div>
               </div>
             </div>
             <p className="hex-decoration mt-4 text-center">
-              0x4E41504F4C49 // NAPOLI_1985
+              0x4E41504F4C49 // STUDIO_2026
             </p>
           </motion.div>
 
@@ -294,25 +297,24 @@ const AboutSection = () => {
             <p className="label-terminal mb-4">{'>'} ACCESS_FILE: BIO.TXT</p>
             
             <h2 className="text-3xl md:text-4xl font-typewriter mb-8" data-testid="about-title">
-              Da <span className="text-amber-400">1985</span> a <span className="text-cyan-400">2026</span>
-              <br />Un viaggio nel tempo
+              Content Creator con vista <span className="text-cyan-400">Vesuvio</span>
             </h2>
 
             <div className="terminal-card p-8 mb-8">
               <div className="space-y-6 text-stone-400 font-mono text-sm leading-relaxed">
                 <p>
-                  <span className="text-cyan-500">{'>'}</span> Mi chiamo Gio. Per 20 anni ho diretto supermercati. 
-                  Poi ho capito che le storie più belle non erano negli scaffali, 
-                  ma nelle persone che li attraversavano.
+                  <span className="text-cyan-500">{'>'}</span> Mi chiamo Gio, ma tutti mi chiamano <span className="text-amber-400">Zio Gio</span>. 
+                  Dal mio studio a Napoli, con il Vesuvio come sfondo, creo contenuti che mescolano 
+                  <span className="text-cyan-400"> tecnologia</span> e <span className="text-amber-400">storytelling</span>.
                 </p>
                 <p>
-                  <span className="text-cyan-500">{'>'}</span> Oggi uso l'<span className="text-cyan-400">intelligenza artificiale</span> per 
-                  immaginare come sarebbero state le foto di mio nonno se avesse avuto 
-                  questa tecnologia. Mescolo <span className="text-amber-400">nostalgia</span> e <span className="text-cyan-400">futuro</span>.
+                  <span className="text-cyan-500">{'>'}</span> Uso l'<span className="text-cyan-400">intelligenza artificiale</span> per 
+                  immaginare mondi dove passato e futuro si incontrano. I miei prompt creano 
+                  visioni di come sarebbe stato il mondo se l'AI fosse esistita ieri.
                 </p>
                 <p>
                   <span className="text-cyan-500">{'>'}</span> Il progetto <span className="text-amber-400">"Il giro del mondo in..."</span> nasce 
-                  da questa domanda: e se avessimo potuto documentare il passato con l'AI?
+                  da questa passione: raccontare storie attraverso persone, luoghi e tecnologia.
                 </p>
               </div>
             </div>
@@ -328,7 +330,7 @@ const AboutSection = () => {
               </div>
               <div className="stat-retro">
                 <div className="value text-cyan-400">∞</div>
-                <div className="label">Memorie</div>
+                <div className="label">Prompt AI</div>
               </div>
             </div>
           </motion.div>
@@ -560,7 +562,7 @@ const Footer = () => (
       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <Terminal size={18} className="text-cyan-500" />
-          <span className="font-terminal text-sm">UNCLE_GIO // AI_STORYTELLER</span>
+          <span className="font-terminal text-sm">ZIO_GIO // AI_STORYTELLER</span>
         </div>
         <p className="text-xs text-stone-600 font-mono">
           © 1955-2026 // TEMPORAL_RIGHTS_RESERVED
