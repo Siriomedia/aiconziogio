@@ -1,0 +1,107 @@
+{
+  "theme": "dark",
+  "archetype": "5 (Jewel & Luxury)",
+  "vibe": "Cinematic, moody, expensive feel. Heritage meets futuristic storytelling.",
+  "colors": {
+    "background": "#0F0D0C",
+    "surface": "#1A1614",
+    "primary": "#B26941",
+    "secondary": "#E6C9A8",
+    "accent": "#D9875A",
+    "text_main": "#FDFBF7",
+    "text_muted": "#A6988D",
+    "border": "#332A25"
+  },
+  "typography": {
+    "headings": {
+      "family": "Playfair Display",
+      "style": "font-serif",
+      "weights": "font-bold font-black font-medium",
+      "letter_spacing": "tracking-tighter"
+    },
+    "body": {
+      "family": "Outfit",
+      "style": "font-sans",
+      "weights": "font-light font-normal"
+    },
+    "labels": {
+      "style": "uppercase text-xs tracking-[0.2em] text-[#B26941]"
+    }
+  },
+  "layout_and_spacing": {
+    "philosophy": "Generous spacing. Bento Grids for galleries. Asymmetry and cinematic overlapping.",
+    "container_padding": "p-8 md:p-12 lg:p-20",
+    "grid_bento": "grid-cols-1 md:grid-cols-12 gap-8 md:gap-12",
+    "section_spacing": "py-24 md:py-32"
+  },
+  "surfaces_and_effects": {
+    "glassmorphism": "bg-[#1A1614]/70 backdrop-blur-xl border border-[#FDFBF7]/10",
+    "textures": "Grainy noise overlays using CSS or image on dark backgrounds to evoke analog film",
+    "shadows": "Ambient copper glow shadow-[0_8px_32px_rgba(178,105,65,0.15)]",
+    "borders": "1px solid #332A25 (soft warm border for dividing sections, not full boxes)"
+  },
+  "motion": {
+    "hover": "Subtle scale up (scale-105 for images), border color shift to #B26941",
+    "scroll": "Lenis smooth scroll is mandatory. Fade in up for content to simulate cinematic reveals."
+  },
+  "components": {
+    "nav": "Sticky glassmorphism header, visible links on desktop",
+    "buttons": "Flat background with copper accent, or outlined with text-[#B26941]. Hover state must be lighter copper.",
+    "cards": "Cardless or minimalistic containers. Do not use standard Shadcn bordered cards. Opt for editorial layout (e.g., image top, text below with no borders, just generous spacing).",
+    "forms": "Shadcn UI customized with #332A25 borders, #1A1614 backgrounds, and #B26941 focus rings"
+  },
+  "media_and_images": {
+    "hero": {
+      "url": "https://images.pexels.com/photos/35042068/pexels-photo-35042068.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Cinematic sunset view of ferries on Istanbul's Bosphorus with a moody silhouette effect.",
+      "usage": "Hero section background with dark gradient overlay (bg-gradient-to-t from-[#0F0D0C] via-[#0F0D0C]/70 to-transparent)"
+    },
+    "about_profile": {
+      "url": "https://images.unsplash.com/photo-1578069244640-976a4135fada?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwxfHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMG9sZGVyJTIwbWFuJTIwdHJhdmVsZXJ8ZW58MHx8fHwxNzc0OTkyMzYwfDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Portrait of older man traveling with backpack",
+      "usage": "About section profile image. Make it tall (aspect-[3/4]) with subtle rounded corners."
+    },
+    "gallery_travel": [
+      {
+        "url": "https://images.unsplash.com/photo-1763906667343-dcdb19b1ee4e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzR8MHwxfHNlYXJjaHwzfHxuYXBsZXMlMjBzdHJlZXQlMjBwaG90b2dyYXBoeSUyMHRyYXZlbHxlbnwwfHx8fDE3NzQ5OTIzMzR8MA&ixlib=rb-4.1.0&q=85",
+        "alt": "People walking down sunlit narrow street",
+        "title": "Naples Episodes"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1680096485726-18b85f93ec5e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzR8MHwxfHNlYXJjaHwxfHxuYXBsZXMlMjBzdHJlZXQlMjBwaG90b2dyYXBoeSUyMHRyYXZlbHxlbnwwfHx8fDE3NzQ5OTIzMzR8MA&ixlib=rb-4.1.0&q=85",
+        "alt": "Street scene",
+        "title": "Street Stories"
+      }
+    ],
+    "gallery_ai": [
+      {
+        "url": "https://images.pexels.com/photos/30575919/pexels-photo-30575919.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "alt": "Textured abstract art swirling brushstrokes sepia",
+        "title": "AI Art Exploration"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1770170389700-eb0f9b910ed8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxhaSUyMGFydCUyMGFic3RyYWN0JTIwY29wcGVyJTIwc2VwaWF8ZW58MHx8fHwxNzc0OTkyMzM1fDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Glowing orange blue background abstract",
+        "title": "Prompts in Copper"
+      }
+    ],
+    "texture": {
+      "url": "https://images.pexels.com/photos/18599094/pexels-photo-18599094.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "usage": "Optional overlay as a low opacity (e.g., 5-10%) background texture across main sections for film grain look. Add pointer-events-none."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Install and use `@fontsource/playfair-display` (or google fonts) for Headings and `@fontsource/outfit` for Body fonts.",
+    "Install `lucide-react` or `@phosphor-icons/react` for icons.",
+    "Implement `lenis` for smooth scrolling. This is crucial for the cinematic feel.",
+    "Use `framer-motion` for staggering entrance animations on the gallery items and text reveals.",
+    "For the hero section, overlay a heavy gradient `bg-gradient-to-t from-[#0F0D0C] via-[#0F0D0C]/60 to-transparent` over the image to ensure the text (H1: 'Racconto il mondo attraverso persone, luoghi e intelligenza artificiale') is readable.",
+    "Do NOT use generic Shadcn Card components without heavy customization. Make them look editorial (border-b only, or bento grid style with big photos).",
+    "Navigation must be visible on desktop, no hamburger until mobile.",
+    "Add `data-testid` to all interactive elements.",
+    "Include specific sections: Hero, About (Chi Sono - ex supermarket director turned creator, 'Il giro del mondo in...'), Projects/Series Gallery, AI Prompts Blog, Contact Form.",
+    "Make heavy use of wide gaps (gap-8, gap-12) and negative space.",
+    "Social links (Instagram, TikTok, Facebook) should be elegantly placed in header/footer.",
+    "The Contact form must look premium: bottom border inputs only (border-b) instead of full boxed inputs, or subtly filled dark inputs."
+  ]
+}
