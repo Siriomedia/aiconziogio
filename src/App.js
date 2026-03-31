@@ -1,62 +1,57 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import Lenis from 'lenis';
-import { Instagram, Facebook, Mail, Menu, X, MapPin, ArrowRight, ExternalLink } from "lucide-react";
+import { Instagram, Facebook, Mail, Menu, X, Terminal, Cpu, ScanLine, Zap, Clock, ArrowRight } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Social Links
 const SOCIAL_LINKS = {
   instagram: "https://instagram.com/aiconziogio",
   facebook: "https://facebook.com/profile.php?id=100084321234567",
   tiktok: "https://tiktok.com/@aiconziogio"
 };
 
-// TikTok Icon Component
+// TikTok Icon
 const TikTokIcon = ({ size = 20 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
   </svg>
 );
 
-// Smooth Scroll Provider
+// Generate random hex
+const randomHex = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+
+// Smooth Scroll
 const useSmoothScroll = () => {
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-    });
-
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    const lenis = new Lenis({ duration: 1.2, smoothWheel: true });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
     requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-    };
+    return () => lenis.destroy();
   }, []);
 };
 
-// Animation variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] } }
+// Glitch animation variants
+const glitchIn = {
+  hidden: { opacity: 0, x: -20, filter: 'blur(4px)' },
+  visible: { 
+    opacity: 1, 
+    x: 0, 
+    filter: 'blur(0px)',
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } 
+  }
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
-// Navigation Component
+// Navigation
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -68,16 +63,14 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
+  useEffect(() => setIsOpen(false), [location]);
 
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "Chi Sono", path: "/#about" },
+    { name: "Chi_Sono", path: "/#about" },
     { name: "Progetti", path: "/#projects" },
     { name: "Galleria", path: "/gallery" },
-    { name: "Prompt AI", path: "/blog" },
+    { name: "Prompt_AI", path: "/blog" },
     { name: "Contatti", path: "/#contact" }
   ];
 
@@ -87,8 +80,7 @@ const Navigation = () => {
       if (location.pathname !== "/") {
         window.location.href = path;
       } else {
-        const element = document.getElementById(id);
-        element?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
       }
     }
     setIsOpen(false);
@@ -98,107 +90,74 @@ const Navigation = () => {
     <>
       <nav 
         data-testid="main-navigation"
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? 'glass py-4' : 'py-6 bg-transparent'
-        }`}
+        className={`nav-retro py-4 transition-all duration-300 ${scrolled ? 'shadow-lg' : ''}`}
       >
         <div className="container-custom flex items-center justify-between">
           <Link to="/" data-testid="logo-link" className="flex items-center gap-3">
-            <span className="font-serif text-2xl font-bold tracking-tight">
-              Uncle <span className="text-[#B26941]">Gio</span>
+            <Terminal size={20} className="text-cyan-500" />
+            <span className="font-terminal text-lg tracking-tight">
+              <span className="text-cyan-500">{'>'}</span> UNCLE_GIO
             </span>
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
               item.path.startsWith("/#") ? (
                 <button
                   key={item.name}
                   onClick={() => handleNavClick(item.path)}
-                  className="nav-link text-sm font-light tracking-wide text-[#A6988D] hover:text-[#FDFBF7] transition-colors"
-                  data-testid={`nav-${item.name.toLowerCase().replace(' ', '-')}`}
+                  className="font-terminal text-xs tracking-wider text-stone-400 hover:text-amber-400 transition-colors"
+                  data-testid={`nav-${item.name.toLowerCase()}`}
                 >
-                  {item.name}
+                  [{item.name}]
                 </button>
               ) : (
                 <Link
                   key={item.name}
                   to={item.path}
-                  className="nav-link text-sm font-light tracking-wide text-[#A6988D] hover:text-[#FDFBF7] transition-colors"
-                  data-testid={`nav-${item.name.toLowerCase().replace(' ', '-')}`}
+                  className="font-terminal text-xs tracking-wider text-stone-400 hover:text-amber-400 transition-colors"
+                  data-testid={`nav-${item.name.toLowerCase()}`}
                 >
-                  {item.name}
+                  [{item.name}]
                 </Link>
               )
             ))}
           </div>
 
-          {/* Social Icons - Desktop */}
-          <div className="hidden md:flex items-center gap-4">
-            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="social-icon" data-testid="social-instagram">
-              <Instagram size={18} />
+          <div className="hidden md:flex items-center gap-3">
+            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-instagram">
+              <Instagram size={16} />
             </a>
-            <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="social-icon" data-testid="social-tiktok">
-              <TikTokIcon size={18} />
+            <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-tiktok">
+              <TikTokIcon size={16} />
             </a>
-            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="social-icon" data-testid="social-facebook">
-              <Facebook size={18} />
+            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-facebook">
+              <Facebook size={16} />
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden p-2"
-            onClick={() => setIsOpen(!isOpen)}
-            data-testid="mobile-menu-toggle"
-          >
+          <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)} data-testid="mobile-menu-toggle">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <div className={`mobile-menu ${isOpen ? 'open' : ''}`} data-testid="mobile-menu">
-        <button 
-          className="absolute top-6 right-6"
-          onClick={() => setIsOpen(false)}
-          data-testid="mobile-menu-close"
-        >
+        <button className="absolute top-6 right-6" onClick={() => setIsOpen(false)} data-testid="mobile-menu-close">
           <X size={24} />
         </button>
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center justify-center h-full gap-8">
           {navItems.map((item) => (
             item.path.startsWith("/#") ? (
-              <button
-                key={item.name}
-                onClick={() => handleNavClick(item.path)}
-                className="text-2xl font-serif tracking-wide"
-              >
-                {item.name}
+              <button key={item.name} onClick={() => handleNavClick(item.path)} className="font-terminal text-xl tracking-wide text-stone-300 hover:text-cyan-400">
+                [{item.name}]
               </button>
             ) : (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="text-2xl font-serif tracking-wide"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.name}
+              <Link key={item.name} to={item.path} className="font-terminal text-xl tracking-wide text-stone-300 hover:text-cyan-400" onClick={() => setIsOpen(false)}>
+                [{item.name}]
               </Link>
             )
           ))}
-          <div className="flex items-center gap-6 mt-8">
-            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="social-icon">
-              <Instagram size={20} />
-            </a>
-            <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="social-icon">
-              <TikTokIcon size={20} />
-            </a>
-            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="social-icon">
-              <Facebook size={20} />
-            </a>
-          </div>
         </div>
       </div>
     </>
@@ -207,53 +166,80 @@ const Navigation = () => {
 
 // Hero Section
 const HeroSection = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <section data-testid="hero-section" className="relative min-h-screen flex items-end pb-24 md:pb-32">
-      {/* Background Image */}
+    <section data-testid="hero-section" className="hero-retro scanlines">
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.pexels.com/photos/35042068/pexels-photo-35042068.jpeg?auto=compress&cs=tinysrgb&w=1920"
-          alt="Tramonto cinematografico sul Bosforo"
-          className="w-full h-full object-cover"
+          src="https://images.pexels.com/photos/35378672/pexels-photo-35378672.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="Vintage computer terminal"
+          className="w-full h-full object-cover opacity-40"
+          style={{ filter: 'sepia(70%) contrast(1.2)' }}
         />
-        <div className="absolute inset-0 hero-gradient" />
       </div>
 
-      {/* Content */}
-      <div className="container-custom relative z-10">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="max-w-3xl"
-        >
-          <motion.p variants={fadeInUp} className="label-accent mb-6">
-            Digital Creator & AI Storyteller
-          </motion.p>
+      <div className="container-custom relative z-10 py-32">
+        <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="max-w-4xl">
+          
+          <motion.div variants={glitchIn} className="flex items-center gap-4 mb-8">
+            <div className="badge-retro">
+              <Cpu size={12} />
+              <span>AI_STORYTELLER v2.0</span>
+            </div>
+            <span className="font-terminal text-xs text-stone-500">
+              {time.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          </motion.div>
+
+          <motion.div variants={glitchIn} className="mb-6">
+            <p className="font-terminal text-xs text-cyan-500 mb-2">{'>'} INITIALIZING MEMORY_BANK...</p>
+            <p className="font-terminal text-xs text-amber-500">{'>'} LOADING TEMPORAL_STORIES...</p>
+          </motion.div>
+
           <motion.h1 
-            variants={fadeInUp}
-            className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold leading-tight mb-8"
+            variants={glitchIn}
+            className="text-4xl md:text-6xl lg:text-7xl font-typewriter leading-tight mb-8 glitch-text-hover"
             data-testid="hero-title"
           >
-            Racconto il mondo attraverso{" "}
-            <span className="text-[#B26941]">persone</span>,{" "}
-            <span className="text-[#D9875A]">luoghi</span> e{" "}
-            <span className="text-[#E6C9A8]">intelligenza artificiale</span>
+            <span className="text-stone-200">E se l'</span>
+            <span className="text-cyan-400 text-glow-cyan">AI</span>
+            <span className="text-stone-200"> fosse esistita </span>
+            <br />
+            <span className="text-amber-400 text-glow-amber">nel passato</span>
+            <span className="text-stone-200">?</span>
           </motion.h1>
-          <motion.p 
-            variants={fadeInUp}
-            className="text-lg md:text-xl text-[#A6988D] font-light mb-10 max-w-2xl"
-          >
-            Benvenuti nel mio viaggio. Sono Uncle Gio e vi porto con me alla scoperta di storie autentiche, 
-            dall'Italia al mondo intero.
+
+          <motion.p variants={glitchIn} className="text-lg md:text-xl text-stone-400 font-mono mb-10 max-w-2xl leading-relaxed">
+            Viaggio attraverso il tempo con l'intelligenza artificiale. 
+            Storie di ieri raccontate con la tecnologia di domani.
+            <span className="cursor-blink"></span>
           </motion.p>
-          <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-            <a href="#projects" className="btn-primary" data-testid="hero-cta-projects">
-              Scopri i Progetti
+
+          <motion.div variants={glitchIn} className="flex flex-wrap gap-4">
+            <a href="#projects" className="btn-cyber" data-testid="hero-cta-projects">
+              <span className="flex items-center gap-2">
+                <ScanLine size={14} />
+                SCAN_PROGETTI
+              </span>
             </a>
-            <a href="#about" className="btn-outline" data-testid="hero-cta-about">
-              Chi Sono
+            <a href="#about" className="btn-vintage" data-testid="hero-cta-about">
+              <span className="flex items-center gap-2">
+                <Clock size={14} />
+                CHI_SONO
+              </span>
             </a>
+          </motion.div>
+
+          <motion.div variants={glitchIn} className="mt-16 flex items-center gap-8 text-stone-600 font-terminal text-xs">
+            <span>SYS_STATUS: ONLINE</span>
+            <span>MEM: 1955-2026</span>
+            <span>LOC: NAPOLI_IT</span>
           </motion.div>
         </motion.div>
       </div>
@@ -264,72 +250,85 @@ const HeroSection = () => {
 // About Section
 const AboutSection = () => {
   return (
-    <section id="about" data-testid="about-section" className="section bg-[#0F0D0C]">
+    <section id="about" data-testid="about-section" className="section bg-stone-950">
       <div className="container-custom">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-          {/* Image */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+          
           <motion.div 
             className="lg:col-span-5"
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="relative aspect-[3/4] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1578069244640-976a4135fada?w=800"
-                alt="Uncle Gio - Digital Creator"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0F0D0C] to-transparent">
-                <div className="flex items-center gap-2 text-[#B26941]">
-                  <MapPin size={16} />
-                  <span className="text-sm font-light">Napoli, Italia</span>
+            <div className="vintage-frame">
+              <div className="relative overflow-hidden aspect-[3/4] crt-effect">
+                <img
+                  src="https://images.unsplash.com/photo-1724627561609-9cd3facba8d4?w=800"
+                  alt="Uncle Gio con fotocamera vintage"
+                  className="w-full h-full object-cover sepia-vintage"
+                />
+                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end ai-overlay">
+                  <div className="bg-stone-950/80 px-3 py-2 border border-cyan-500/50">
+                    <p className="hex-code">ID: UG_001</p>
+                    <p className="font-terminal text-xs text-cyan-400">SUBJECT: UNCLE_GIO</p>
+                  </div>
+                  <div className="bg-stone-950/80 px-3 py-2 border border-amber-500/50">
+                    <p className="font-terminal text-xs text-amber-400">MATCH: 99.7%</p>
+                  </div>
                 </div>
               </div>
             </div>
+            <p className="hex-decoration mt-4 text-center">
+              0x4E41504F4C49 // NAPOLI_1985
+            </p>
           </motion.div>
 
-          {/* Content */}
           <motion.div 
             className="lg:col-span-7"
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <p className="label-accent mb-4">Chi Sono</p>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold mb-8" data-testid="about-title">
-              Da direttore di supermercato a{" "}
-              <span className="text-[#B26941]">narratore digitale</span>
+            <p className="label-terminal mb-4">{'>'} ACCESS_FILE: BIO.TXT</p>
+            
+            <h2 className="text-3xl md:text-4xl font-typewriter mb-8" data-testid="about-title">
+              Da <span className="text-amber-400">1985</span> a <span className="text-cyan-400">2026</span>
+              <br />Un viaggio nel tempo
             </h2>
-            <div className="space-y-6 text-[#A6988D] font-light text-lg leading-relaxed">
-              <p>
-                Mi chiamo Gio, ma tutti mi chiamano Uncle Gio. Dopo anni passati a dirigere supermercati, 
-                ho deciso di seguire la mia vera passione: raccontare storie.
-              </p>
-              <p>
-                Oggi sono un digital creator che esplora il mondo attraverso le persone che incontra. 
-                Il mio progetto <strong className="text-[#E6C9A8]">"Il giro del mondo in..."</strong> nasce 
-                dall'idea che ogni luogo ha anime da scoprire e storie da raccontare.
-              </p>
-              <p>
-                Uso l'intelligenza artificiale come strumento creativo per generare immagini evocative 
-                e condivido i miei prompt per ispirare altri a sperimentare con l'AI Art.
-              </p>
+
+            <div className="terminal-card p-8 mb-8">
+              <div className="space-y-6 text-stone-400 font-mono text-sm leading-relaxed">
+                <p>
+                  <span className="text-cyan-500">{'>'}</span> Mi chiamo Gio. Per 20 anni ho diretto supermercati. 
+                  Poi ho capito che le storie più belle non erano negli scaffali, 
+                  ma nelle persone che li attraversavano.
+                </p>
+                <p>
+                  <span className="text-cyan-500">{'>'}</span> Oggi uso l'<span className="text-cyan-400">intelligenza artificiale</span> per 
+                  immaginare come sarebbero state le foto di mio nonno se avesse avuto 
+                  questa tecnologia. Mescolo <span className="text-amber-400">nostalgia</span> e <span className="text-cyan-400">futuro</span>.
+                </p>
+                <p>
+                  <span className="text-cyan-500">{'>'}</span> Il progetto <span className="text-amber-400">"Il giro del mondo in..."</span> nasce 
+                  da questa domanda: e se avessimo potuto documentare il passato con l'AI?
+                </p>
+              </div>
             </div>
-            <div className="mt-10 flex flex-wrap gap-8">
-              <div>
-                <span className="block text-4xl font-serif font-bold text-[#B26941]">5K+</span>
-                <span className="text-sm text-[#A6988D]">Follower</span>
+
+            <div className="grid grid-cols-3 gap-6">
+              <div className="stat-retro">
+                <div className="value">5K+</div>
+                <div className="label">Followers</div>
               </div>
-              <div>
-                <span className="block text-4xl font-serif font-bold text-[#B26941]">50+</span>
-                <span className="text-sm text-[#A6988D]">Storie Raccontate</span>
+              <div className="stat-retro">
+                <div className="value text-amber-400">50+</div>
+                <div className="label">Storie</div>
               </div>
-              <div>
-                <span className="block text-4xl font-serif font-bold text-[#B26941]">∞</span>
-                <span className="text-sm text-[#A6988D]">Luoghi da Esplorare</span>
+              <div className="stat-retro">
+                <div className="value text-cyan-400">∞</div>
+                <div className="label">Memorie</div>
               </div>
             </div>
           </motion.div>
@@ -349,34 +348,11 @@ const ProjectsSection = () => {
       try {
         const response = await axios.get(`${API}/projects`);
         setProjects(response.data);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        // Fallback data
+      } catch {
         setProjects([
-          {
-            id: '1',
-            title: 'Napoli - Storie di Quartiere',
-            slug: 'napoli-storie',
-            description: 'Un viaggio attraverso i vicoli di Napoli, incontrando personaggi autentici.',
-            image_url: 'https://images.unsplash.com/photo-1763906667343-dcdb19b1ee4e?w=800',
-            category: 'serie'
-          },
-          {
-            id: '2',
-            title: 'Il Giro del Mondo in...',
-            slug: 'giro-del-mondo',
-            description: 'Esplorare il mondo attraverso le persone, i luoghi e l\'intelligenza artificiale.',
-            image_url: 'https://images.pexels.com/photos/35042068/pexels-photo-35042068.jpeg?w=800',
-            category: 'serie'
-          },
-          {
-            id: '3',
-            title: 'Collaborazione Sora',
-            slug: 'sora-collaboration',
-            description: 'Esperimenti creativi con Sora AI per creare contenuti video innovativi.',
-            image_url: 'https://images.unsplash.com/photo-1770170389700-eb0f9b910ed8?w=800',
-            category: 'collaborazione'
-          }
+          { id: '1', title: 'Napoli 1955', slug: 'napoli-1955', description: 'Come sarebbe stata Napoli del dopoguerra vista dall\'AI', image_url: 'https://images.unsplash.com/photo-1769690093979-252e3b9a8fac?w=800', category: 'TEMPORAL_SCAN' },
+          { id: '2', title: 'Il Giro del Mondo in...', slug: 'giro-del-mondo', description: 'Viaggiatori del passato incontrano la tecnologia del futuro', image_url: 'https://images.unsplash.com/photo-1768268959053-770212976791?w=800', category: 'SERIES' },
+          { id: '3', title: 'Memorie Digitali', slug: 'memorie-digitali', description: 'Ricostruzioni AI di foto di famiglia perdute', image_url: 'https://images.unsplash.com/photo-1735551031738-037221642171?w=800', category: 'AI_RESTORE' }
         ]);
       } finally {
         setLoading(false);
@@ -386,24 +362,24 @@ const ProjectsSection = () => {
   }, []);
 
   return (
-    <section id="projects" data-testid="projects-section" className="section bg-[#1A1614]">
+    <section id="projects" data-testid="projects-section" className="section bg-stone-900">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="mb-16"
         >
-          <p className="label-accent mb-4">Progetti & Serie</p>
-          <h2 className="text-3xl md:text-5xl font-serif font-bold" data-testid="projects-title">
-            Le mie <span className="text-[#B26941]">avventure</span>
+          <p className="label-terminal mb-4">{'>'} LOADING PROJECTS...</p>
+          <h2 className="text-3xl md:text-5xl font-typewriter" data-testid="projects-title">
+            <span className="text-stone-200">Archivio </span>
+            <span className="text-cyan-400">Temporale</span>
           </h2>
         </motion.div>
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="loading-spinner" />
+            <div className="loading-terminal" />
           </div>
         ) : (
           <motion.div 
@@ -413,18 +389,24 @@ const ProjectsSection = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            {projects.map((project) => (
+            {projects.map((project, idx) => (
               <motion.div
                 key={project.id}
-                variants={fadeInUp}
-                className="project-card card-glow"
+                variants={glitchIn}
+                className="project-retro group"
                 data-testid={`project-card-${project.slug}`}
               >
-                <img src={project.image_url} alt={project.title} />
-                <div className="project-overlay">
-                  <span className="label-accent mb-2 block">{project.category}</span>
-                  <h3 className="text-xl font-serif font-bold mb-2">{project.title}</h3>
-                  <p className="text-sm text-[#A6988D] font-light line-clamp-2">{project.description}</p>
+                <div className="aspect-[4/3] overflow-hidden relative">
+                  <img src={project.image_url} alt={project.title} className="crt-effect" />
+                  <div className="overlay-data">
+                    <span>SCAN_{String(idx + 1).padStart(3, '0')}</span>
+                    <span>{randomHex()}</span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="label-vintage mb-2">{project.category}</p>
+                  <h3 className="font-typewriter text-xl text-stone-200 mb-2">{project.title}</h3>
+                  <p className="text-stone-500 text-sm font-mono">{project.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -443,131 +425,128 @@ const ContactSection = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ loading: true, success: false, error: null });
-
     try {
       await axios.post(`${API}/contact`, formData);
       setStatus({ loading: false, success: true, error: null });
       setFormData({ name: '', email: '', message: '' });
       setTimeout(() => setStatus(prev => ({ ...prev, success: false })), 5000);
-    } catch (error) {
-      setStatus({ loading: false, success: false, error: 'Errore nell\'invio. Riprova.' });
+    } catch {
+      setStatus({ loading: false, success: false, error: 'ERRORE_TRASMISSIONE. Riprova.' });
     }
   };
 
   return (
-    <section id="contact" data-testid="contact-section" className="section bg-[#0F0D0C]">
+    <section id="contact" data-testid="contact-section" className="section bg-stone-950">
       <div className="container-custom">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-          {/* Info */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
           >
-            <p className="label-accent mb-4">Contatti</p>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold mb-8" data-testid="contact-title">
-              Parliamo del tuo{" "}
-              <span className="text-[#B26941]">prossimo progetto</span>
+            <p className="label-terminal mb-4">{'>'} OPEN_CHANNEL</p>
+            <h2 className="text-3xl md:text-4xl font-typewriter mb-8" data-testid="contact-title">
+              <span className="text-stone-200">Trasmetti un </span>
+              <span className="text-cyan-400">messaggio</span>
             </h2>
-            <p className="text-[#A6988D] font-light text-lg mb-10">
-              Hai un'idea, una collaborazione in mente, o semplicemente vuoi condividere una storia? 
-              Mi farebbe piacere sentirti.
+            <p className="text-stone-400 font-mono text-sm mb-10 leading-relaxed">
+              Vuoi collaborare? Hai una storia del passato da raccontare? 
+              Invia un segnale attraverso il tempo.
             </p>
 
-            <div className="space-y-6">
-              <a 
-                href={`mailto:info@aiconziogio.com`}
-                className="flex items-center gap-4 text-[#A6988D] hover:text-[#B26941] transition-colors"
-              >
-                <Mail size={20} />
-                <span>info@aiconziogio.com</span>
+            <div className="space-y-4">
+              <a href="mailto:info@aiconziogio.com" className="flex items-center gap-4 text-stone-500 hover:text-cyan-400 transition-colors font-mono text-sm">
+                <Mail size={18} />
+                info@aiconziogio.com
               </a>
               <div className="flex items-center gap-4 pt-4">
-                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="social-icon">
-                  <Instagram size={18} />
+                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="social-retro">
+                  <Instagram size={16} />
                 </a>
-                <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="social-icon">
-                  <TikTokIcon size={18} />
+                <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="social-retro">
+                  <TikTokIcon size={16} />
                 </a>
-                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="social-icon">
-                  <Facebook size={18} />
+                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="social-retro">
+                  <Facebook size={16} />
                 </a>
               </div>
             </div>
           </motion.div>
 
-          {/* Form */}
-          <motion.form
-            onSubmit={handleSubmit}
+          <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-8"
-            data-testid="contact-form"
+            transition={{ delay: 0.2 }}
           >
-            <div>
-              <label className="block text-sm text-[#A6988D] mb-2">Nome</label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="input-underline"
-                placeholder="Il tuo nome"
-                data-testid="contact-name"
-              />
+            <div className="terminal-card">
+              <div className="terminal-header">
+                <span className="terminal-dot red"></span>
+                <span className="terminal-dot yellow"></span>
+                <span className="terminal-dot green"></span>
+                <span className="font-terminal text-xs text-stone-500 ml-4">message_terminal.exe</span>
+              </div>
+              <form onSubmit={handleSubmit} className="p-8 space-y-8" data-testid="contact-form">
+                <div>
+                  <label className="block text-xs text-stone-500 font-terminal mb-2">NOME_UTENTE</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="input-terminal"
+                    placeholder="Inserisci nome..."
+                    data-testid="contact-name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-stone-500 font-terminal mb-2">EMAIL_ADDRESS</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="input-terminal"
+                    placeholder="email@esempio.com"
+                    data-testid="contact-email"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-stone-500 font-terminal mb-2">MESSAGGIO_BODY</label>
+                  <textarea
+                    required
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="textarea-terminal"
+                    placeholder="Scrivi il tuo messaggio..."
+                    rows={4}
+                    data-testid="contact-message"
+                  />
+                </div>
+                <button type="submit" disabled={status.loading} className="btn-cyber w-full" data-testid="contact-submit">
+                  {status.loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="loading-terminal w-4 h-4" />
+                      TRASMISSIONE...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <Zap size={14} />
+                      INVIA_SEGNALE
+                    </span>
+                  )}
+                </button>
+                {status.success && (
+                  <p className="text-green-400 font-terminal text-sm" data-testid="contact-success">
+                    {'>'} MESSAGGIO_RICEVUTO. Risponderò presto.
+                  </p>
+                )}
+                {status.error && (
+                  <p className="text-red-400 font-terminal text-sm" data-testid="contact-error">{status.error}</p>
+                )}
+              </form>
             </div>
-            <div>
-              <label className="block text-sm text-[#A6988D] mb-2">Email</label>
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="input-underline"
-                placeholder="La tua email"
-                data-testid="contact-email"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-[#A6988D] mb-2">Messaggio</label>
-              <textarea
-                required
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="textarea-underline"
-                placeholder="Scrivi il tuo messaggio..."
-                rows={4}
-                data-testid="contact-message"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={status.loading}
-              className="btn-primary w-full md:w-auto flex items-center justify-center gap-2"
-              data-testid="contact-submit"
-            >
-              {status.loading ? (
-                <div className="loading-spinner w-5 h-5" />
-              ) : (
-                <>
-                  Invia Messaggio
-                  <ArrowRight size={16} />
-                </>
-              )}
-            </button>
-
-            {status.success && (
-              <p className="text-green-500" data-testid="contact-success">
-                Messaggio inviato con successo! Ti risponderò presto.
-              </p>
-            )}
-            {status.error && (
-              <p className="text-red-500" data-testid="contact-error">{status.error}</p>
-            )}
-          </motion.form>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -575,45 +554,37 @@ const ContactSection = () => {
 };
 
 // Footer
-const Footer = () => {
-  return (
-    <footer className="py-12 border-t border-[#332A25]" data-testid="footer">
-      <div className="container-custom">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <span className="font-serif text-xl font-bold">
-              Uncle <span className="text-[#B26941]">Gio</span>
-            </span>
-          </div>
-          <p className="text-sm text-[#A6988D] font-light">
-            © 2024 Ai con Zio Gio. Tutti i diritti riservati.
-          </p>
-          <div className="flex items-center gap-4">
-            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="text-[#A6988D] hover:text-[#B26941] transition-colors">
-              <Instagram size={18} />
-            </a>
-            <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="text-[#A6988D] hover:text-[#B26941] transition-colors">
-              <TikTokIcon size={18} />
-            </a>
-            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="text-[#A6988D] hover:text-[#B26941] transition-colors">
-              <Facebook size={18} />
-            </a>
-          </div>
+const Footer = () => (
+  <footer className="footer-retro py-12" data-testid="footer">
+    <div className="container-custom">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-3">
+          <Terminal size={18} className="text-cyan-500" />
+          <span className="font-terminal text-sm">UNCLE_GIO // AI_STORYTELLER</span>
+        </div>
+        <p className="text-xs text-stone-600 font-mono">
+          © 1955-2026 // TEMPORAL_RIGHTS_RESERVED
+        </p>
+        <div className="flex items-center gap-4">
+          <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
+            <Instagram size={16} />
+          </a>
+          <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
+            <TikTokIcon size={16} />
+          </a>
+          <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
+            <Facebook size={16} />
+          </a>
         </div>
       </div>
-    </footer>
-  );
-};
+    </div>
+  </footer>
+);
 
 // Home Page
 const HomePage = () => {
   useSmoothScroll();
-
-  useEffect(() => {
-    // Seed data on first load
-    axios.post(`${API}/seed`).catch(() => {});
-  }, []);
-
+  useEffect(() => { axios.post(`${API}/seed`).catch(() => {}); }, []);
   return (
     <>
       <HeroSection />
@@ -636,14 +607,13 @@ const GalleryPage = () => {
       try {
         const response = await axios.get(`${API}/gallery`);
         setGallery(response.data);
-      } catch (error) {
-        // Fallback data
+      } catch {
         setGallery([
-          { id: '1', title: 'Tramonto sul Vesuvio', image_url: 'https://images.unsplash.com/photo-1680096485726-18b85f93ec5e?w=800', category: 'photo', description: 'I colori del tramonto napoletano' },
-          { id: '2', title: 'Vicoli di Napoli', image_url: 'https://images.unsplash.com/photo-1763906667343-dcdb19b1ee4e?w=800', category: 'photo', description: 'La vita quotidiana nei quartieri storici' },
-          { id: '3', title: 'Istanbul al Tramonto', image_url: 'https://images.pexels.com/photos/35042068/pexels-photo-35042068.jpeg?w=800', category: 'photo', description: 'I traghetti sul Bosforo' },
-          { id: '4', title: 'Viaggio nel Tempo', image_url: 'https://images.pexels.com/photos/30575919/pexels-photo-30575919.jpeg?w=800', category: 'ai_art', description: 'Arte AI ispirata ai viaggi vittoriani' },
-          { id: '5', title: 'Sogni di Rame', image_url: 'https://images.unsplash.com/photo-1770170389700-eb0f9b910ed8?w=800', category: 'ai_art', description: 'Astratto in toni caldi' }
+          { id: '1', title: 'Napoli 1955', image_url: 'https://images.unsplash.com/photo-1769690093979-252e3b9a8fac?w=800', category: 'photo', description: 'Ritratto d\'epoca' },
+          { id: '2', title: 'Minatore', image_url: 'https://images.unsplash.com/photo-1759405185723-02e6c84c9772?w=800', category: 'photo', description: 'Lavoro nel passato' },
+          { id: '3', title: 'Neon Dreams', image_url: 'https://images.pexels.com/photos/8108560/pexels-photo-8108560.jpeg?w=800', category: 'ai_art', description: 'Il futuro immaginato' },
+          { id: '4', title: 'Macchine del Tempo', image_url: 'https://images.unsplash.com/photo-1768268959053-770212976791?w=800', category: 'ai_art', description: 'Steampunk AI' },
+          { id: '5', title: 'Luci Cyber', image_url: 'https://images.pexels.com/photos/28122495/pexels-photo-28122495.jpeg?w=800', category: 'ai_art', description: 'Neon e nostalgia' }
         ]);
       } finally {
         setLoading(false);
@@ -655,70 +625,55 @@ const GalleryPage = () => {
   const filteredGallery = filter === 'all' ? gallery : gallery.filter(item => item.category === filter);
 
   return (
-    <section className="section pt-32" data-testid="gallery-page">
+    <section className="section pt-32 bg-stone-950" data-testid="gallery-page">
       <div className="container-custom">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <p className="label-accent mb-4">Galleria</p>
-          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-8" data-testid="gallery-title">
-            Foto & <span className="text-[#B26941]">AI Art</span>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+          <p className="label-terminal mb-4">{'>'} ACCESSING ARCHIVE...</p>
+          <h1 className="text-3xl md:text-5xl font-typewriter mb-8" data-testid="gallery-title">
+            <span className="text-stone-200">Archivio </span>
+            <span className="text-cyan-400">Visivo</span>
           </h1>
-
-          {/* Filters */}
-          <div className="flex justify-center gap-4 mb-12">
+          <div className="flex gap-4">
             {['all', 'photo', 'ai_art'].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-6 py-2 text-sm font-light tracking-wide transition-all ${
+                className={`font-terminal text-xs px-4 py-2 border transition-all ${
                   filter === f 
-                    ? 'text-[#B26941] border-b-2 border-[#B26941]' 
-                    : 'text-[#A6988D] hover:text-[#FDFBF7]'
+                    ? 'border-cyan-500 text-cyan-400 bg-cyan-500/10' 
+                    : 'border-stone-700 text-stone-500 hover:border-amber-500 hover:text-amber-400'
                 }`}
                 data-testid={`filter-${f}`}
               >
-                {f === 'all' ? 'Tutti' : f === 'photo' ? 'Foto' : 'AI Art'}
+                [{f === 'all' ? 'TUTTI' : f === 'photo' ? 'VINTAGE' : 'AI_ART'}]
               </button>
             ))}
           </div>
         </motion.div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="loading-spinner" />
-          </div>
+          <div className="flex justify-center py-20"><div className="loading-terminal" /></div>
         ) : (
-          <motion.div 
-            className="gallery-grid"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div className="bento-retro" variants={staggerContainer} initial="hidden" animate="visible">
             <AnimatePresence>
               {filteredGallery.map((item) => (
                 <motion.div
                   key={item.id}
-                  variants={fadeInUp}
+                  variants={glitchIn}
                   layout
-                  className="relative overflow-hidden aspect-square group"
+                  className="vintage-ai-photo relative overflow-hidden aspect-square neon-border"
                   data-testid={`gallery-item-${item.id}`}
                 >
-                  <img 
-                    src={item.image_url} 
-                    alt={item.title}
-                    className="w-full h-full object-cover image-hover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0F0D0C] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                  <img src={item.image_url} alt={item.title} className="w-full h-full object-cover sepia-vintage" />
+                  <div className="ai-overlay absolute inset-0 flex flex-col justify-between p-4 bg-gradient-to-t from-stone-950/90 to-transparent">
+                    <div className="flex justify-between">
+                      <span className="hex-code">{randomHex()}</span>
+                      <span className="hex-code">SCAN_OK</span>
+                    </div>
                     <div>
-                      <span className="label-accent mb-1 block">{item.category === 'photo' ? 'Foto' : 'AI Art'}</span>
-                      <h3 className="text-lg font-serif font-bold">{item.title}</h3>
-                      {item.description && (
-                        <p className="text-sm text-[#A6988D] mt-1">{item.description}</p>
-                      )}
+                      <p className="label-terminal mb-1">{item.category === 'photo' ? 'VINTAGE' : 'AI_GEN'}</p>
+                      <h3 className="font-typewriter text-lg text-stone-200">{item.title}</h3>
+                      <p className="text-stone-500 text-xs font-mono">{item.description}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -742,36 +697,11 @@ const BlogPage = () => {
       try {
         const response = await axios.get(`${API}/blog`);
         setPosts(response.data);
-      } catch (error) {
-        // Fallback data
+      } catch {
         setPosts([
-          {
-            id: '1',
-            title: 'Il Viaggio di Phileas Fogg in 80 Giorni',
-            slug: 'phileas-fogg-viaggio',
-            excerpt: 'Un prompt per creare un\'immagine iper-dettagliata ispirata al celebre romanzo di Jules Verne.',
-            prompt_text: 'Create a hyper-detailed cinematic image of a Victorian gentleman traveler...',
-            image_url: 'https://images.pexels.com/photos/30575919/pexels-photo-30575919.jpeg?w=800',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '2',
-            title: 'Uncle Gio - Il Narratore Digitale',
-            slug: 'uncle-gio-narratore',
-            excerpt: 'Come creare un personaggio AI che rappresenta lo storyteller moderno.',
-            prompt_text: 'Cinematic portrait of an older Italian man...',
-            image_url: 'https://images.unsplash.com/photo-1578069244640-976a4135fada?w=800',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '3',
-            title: 'Napoli Segreta - Vicoli e Storie',
-            slug: 'napoli-segreta',
-            excerpt: 'Un prompt per esplorare i vicoli nascosti di Napoli attraverso l\'AI.',
-            prompt_text: 'Narrow alley in Naples Italy...',
-            image_url: 'https://images.unsplash.com/photo-1763906667343-dcdb19b1ee4e?w=800',
-            created_at: new Date().toISOString()
-          }
+          { id: '1', title: 'Il Viaggio di Phileas Fogg', slug: 'phileas-fogg', excerpt: 'Come ricreare l\'epopea vittoriana con l\'AI', prompt_text: 'Victorian gentleman, steam locomotive, sepia tones, 1880s...', image_url: 'https://images.unsplash.com/photo-1768268959053-770212976791?w=800', created_at: new Date().toISOString() },
+          { id: '2', title: 'Ritratti del Nonno', slug: 'ritratti-nonno', excerpt: 'Restituire vita alle foto sbiadite', prompt_text: 'Restore vintage portrait, enhance details, warm sepia...', image_url: 'https://images.unsplash.com/photo-1769690093979-252e3b9a8fac?w=800', created_at: new Date().toISOString() },
+          { id: '3', title: 'Napoli Cyberpunk', slug: 'napoli-cyberpunk', excerpt: 'E se Napoli del 1950 fosse stata cyberpunk?', prompt_text: 'Naples 1950, neon lights, cyberpunk aesthetic, vintage cars...', image_url: 'https://images.pexels.com/photos/28122495/pexels-photo-28122495.jpeg?w=800', created_at: new Date().toISOString() }
         ]);
       } finally {
         setLoading(false);
@@ -781,79 +711,52 @@ const BlogPage = () => {
   }, []);
 
   return (
-    <section className="section pt-32" data-testid="blog-page">
+    <section className="section pt-32 bg-stone-950" data-testid="blog-page">
       <div className="container-custom">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <p className="label-accent mb-4">Prompt AI</p>
-          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-6" data-testid="blog-title">
-            I miei <span className="text-[#B26941]">prompt</span> creativi
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="mb-16">
+          <p className="label-terminal mb-4">{'>'} PROMPT_DATABASE</p>
+          <h1 className="text-3xl md:text-5xl font-typewriter mb-6" data-testid="blog-title">
+            <span className="text-stone-200">I miei </span>
+            <span className="text-amber-400">Prompt</span>
+            <span className="text-stone-200"> AI</span>
           </h1>
-          <p className="text-[#A6988D] font-light text-lg max-w-2xl mx-auto">
-            Condivido i prompt che uso per creare immagini con l'AI. 
-            Sperimenta e crea le tue opere d'arte digitale.
+          <p className="text-stone-500 font-mono text-sm max-w-2xl">
+            Condivido le istruzioni che uso per viaggiare nel tempo con l'intelligenza artificiale.
+            Copia, sperimenta, crea.
           </p>
         </motion.div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="loading-spinner" />
-          </div>
+          <div className="flex justify-center py-20"><div className="loading-terminal" /></div>
         ) : (
-          <motion.div 
-            className="space-y-16"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            {posts.map((post, index) => (
+          <motion.div className="space-y-12" variants={staggerContainer} initial="hidden" animate="visible">
+            {posts.map((post, idx) => (
               <motion.article
                 key={post.id}
-                variants={fadeInUp}
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
-                  index % 2 === 1 ? 'lg:flex-row-reverse' : ''
-                }`}
+                variants={glitchIn}
+                className="article-retro grid grid-cols-1 lg:grid-cols-3 gap-0 overflow-hidden"
                 data-testid={`blog-post-${post.slug}`}
               >
-                <div className={index % 2 === 1 ? 'lg:order-2' : ''}>
-                  <div className="overflow-hidden aspect-video">
-                    <img 
-                      src={post.image_url} 
-                      alt={post.title}
-                      className="w-full h-full object-cover image-hover"
-                    />
+                <div className="lg:col-span-1 aspect-video lg:aspect-auto overflow-hidden relative crt-effect">
+                  <img src={post.image_url} alt={post.title} className="w-full h-full object-cover sepia-vintage" />
+                  <div className="absolute top-4 left-4 badge-retro">
+                    PROMPT_{String(idx + 1).padStart(3, '0')}
                   </div>
                 </div>
-                <div className={index % 2 === 1 ? 'lg:order-1' : ''}>
-                  <p className="label-accent mb-4">
-                    {new Date(post.created_at).toLocaleDateString('it-IT', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
+                <div className="lg:col-span-2 p-8">
+                  <p className="timestamp mb-4">
+                    {new Date(post.created_at).toLocaleDateString('it-IT')} // AI_PROMPT
                   </p>
-                  <h2 className="text-2xl md:text-3xl font-serif font-bold mb-4">
-                    {post.title}
-                  </h2>
-                  <p className="text-[#A6988D] font-light mb-6">
-                    {post.excerpt}
-                  </p>
+                  <h2 className="font-typewriter text-2xl text-stone-200 mb-4">{post.title}</h2>
+                  <p className="text-stone-500 font-mono text-sm mb-6">{post.excerpt}</p>
                   {post.prompt_text && (
-                    <div className="prompt-block mb-6">
-                      <p className="text-xs text-[#B26941] mb-2 uppercase tracking-wider">Prompt:</p>
-                      {post.prompt_text}
+                    <div className="prompt-block-retro mb-6">
+                      <code>{post.prompt_text}</code>
                     </div>
                   )}
-                  <Link 
-                    to={`/blog/${post.slug}`}
-                    className="btn-outline inline-flex items-center gap-2"
-                  >
-                    Leggi di più
-                    <ArrowRight size={16} />
+                  <Link to={`/blog/${post.slug}`} className="btn-vintage inline-flex items-center gap-2">
+                    LEGGI_DI_PIU
+                    <ArrowRight size={14} />
                   </Link>
                 </div>
               </motion.article>
@@ -865,7 +768,7 @@ const BlogPage = () => {
   );
 };
 
-// Blog Post Detail Page
+// Blog Post Detail
 const BlogPostPage = () => {
   useSmoothScroll();
   const [post, setPost] = useState(null);
@@ -877,13 +780,8 @@ const BlogPostPage = () => {
       try {
         const response = await axios.get(`${API}/blog/${slug}`);
         setPost(response.data);
-      } catch (error) {
-        // Fallback
-        setPost({
-          title: 'Post non trovato',
-          content: 'Il post che stai cercando non esiste.',
-          created_at: new Date().toISOString()
-        });
+      } catch {
+        setPost({ title: 'Post non trovato', content: 'Il post che cerchi non esiste nel database temporale.', created_at: new Date().toISOString() });
       } finally {
         setLoading(false);
       }
@@ -891,63 +789,31 @@ const BlogPostPage = () => {
     fetchPost();
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner" />
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-stone-950"><div className="loading-terminal" /></div>;
 
   return (
-    <section className="section pt-32" data-testid="blog-post-page">
+    <section className="section pt-32 bg-stone-950" data-testid="blog-post-page">
       <div className="container-custom max-w-4xl">
-        <Link to="/blog" className="label-accent flex items-center gap-2 mb-8 hover:text-[#D9875A] transition-colors">
-          ← Torna ai Prompt
+        <Link to="/blog" className="label-terminal flex items-center gap-2 mb-8 hover:text-amber-400 transition-colors">
+          {'<'} TORNA_ARCHIVIO
         </Link>
-
         {post?.image_url && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="aspect-video overflow-hidden mb-12"
-          >
-            <img 
-              src={post.image_url} 
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
-        )}
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <p className="label-accent mb-4">
-            {new Date(post.created_at).toLocaleDateString('it-IT', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
-          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-8">
-            {post.title}
-          </h1>
-
-          <div className="text-[#A6988D] font-light text-lg leading-relaxed space-y-6 mb-12">
-            {post.content?.split('\n').filter(p => p.trim()).map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
+          <div className="vintage-frame mb-12">
+            <div className="aspect-video overflow-hidden crt-effect">
+              <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
+            </div>
           </div>
-
+        )}
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
+          <p className="timestamp mb-4">{new Date(post.created_at).toLocaleDateString('it-IT')} // TEMPORAL_LOG</p>
+          <h1 className="text-3xl md:text-5xl font-typewriter mb-8 text-stone-200">{post.title}</h1>
+          <div className="text-stone-400 font-mono text-sm leading-relaxed space-y-6 mb-12">
+            {post.content?.split('\n').filter(p => p.trim()).map((p, i) => <p key={i}>{p}</p>)}
+          </div>
           {post.prompt_text && (
             <div className="mb-12">
-              <h3 className="text-xl font-serif font-bold mb-4">Il Prompt Completo</h3>
-              <div className="prompt-block">
-                {post.prompt_text}
-              </div>
+              <h3 className="font-typewriter text-xl text-amber-400 mb-4">{'>'} PROMPT_COMPLETO</h3>
+              <div className="prompt-block-retro"><code>{post.prompt_text}</code></div>
             </div>
           )}
         </motion.div>
@@ -959,8 +825,7 @@ const BlogPostPage = () => {
 // Main App
 function App() {
   return (
-    <div className="App min-h-screen bg-[#0F0D0C]">
-      <div className="grain-overlay" />
+    <div className="App min-h-screen bg-stone-950">
       <BrowserRouter>
         <Navigation />
         <Routes>
