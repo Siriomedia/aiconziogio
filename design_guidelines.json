@@ -1,107 +1,121 @@
 {
-  "theme": "dark",
-  "archetype": "5 (Jewel & Luxury)",
-  "vibe": "Cinematic, moody, expensive feel. Heritage meets futuristic storytelling.",
+  "theme": "Dark",
+  "archetype": "Retro-Futurism (Steampunk meets Cyberpunk)",
+  "emotional_tone": "Nostalgic, mysterious, intellectual, analog warmth meeting digital artifacts",
   "colors": {
-    "background": "#0F0D0C",
-    "surface": "#1A1614",
-    "primary": "#B26941",
-    "secondary": "#E6C9A8",
-    "accent": "#D9875A",
-    "text_main": "#FDFBF7",
-    "text_muted": "#A6988D",
-    "border": "#332A25"
-  },
-  "typography": {
-    "headings": {
-      "family": "Playfair Display",
-      "style": "font-serif",
-      "weights": "font-bold font-black font-medium",
-      "letter_spacing": "tracking-tighter"
+    "background": {
+      "base": "#0c0a09",
+      "surface": "#1c1917",
+      "surface_elevated": "#292524"
     },
-    "body": {
-      "family": "Outfit",
-      "style": "font-sans",
-      "weights": "font-light font-normal"
+    "text": {
+      "primary": "#e7e5e4",
+      "secondary": "#a8a29e",
+      "vintage_gold": "#fde047",
+      "muted": "#78716c"
     },
-    "labels": {
-      "style": "uppercase text-xs tracking-[0.2em] text-[#B26941]"
+    "accents": {
+      "neon_cyan": "#06b6d4",
+      "neon_cyan_glow": "rgba(6, 182, 212, 0.5)",
+      "neon_amber": "#f59e0b",
+      "sepia_wash": "rgba(113, 63, 18, 0.3)"
+    },
+    "borders": {
+      "subtle": "#44403c",
+      "highlight": "#06b6d4"
     }
   },
+  "typography": {
+    "fonts": {
+      "headings": "'Special Elite', monospace",
+      "subheadings": "'Space Mono', monospace",
+      "body": "'IBM Plex Mono', monospace"
+    },
+    "sizing": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "body": "text-base leading-relaxed",
+      "overline": "text-xs sm:text-sm tracking-[0.2em] uppercase"
+    }
+  },
+  "visual_enhancers": {
+    "textures": [
+      "Film grain overlay on backgrounds using SVG noise or a semi-transparent noise image.",
+      "Scanlines effect on specific 'digital' containers using repeating-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%) with background-size 100% 4px."
+    ],
+    "shadows": {
+      "neon_cyan": "0 0 10px rgba(6,182,212,0.3), 0 0 20px rgba(6,182,212,0.2)",
+      "neon_amber": "0 0 10px rgba(245,158,11,0.3), 0 0 20px rgba(245,158,11,0.2)",
+      "analog_depth": "4px 4px 0px rgba(0,0,0,0.8)"
+    },
+    "borders": "1px solid #44403c, often paired with an inner 1px border of #78716c for a skeuomorphic 'panel' feel.",
+    "effects": "Glitch hover effects (text shadow displacement: red/cyan), sepia filters (CSS filter: sepia(80%) hue-rotate(-10deg)) on images that clear on hover."
+  },
   "layout_and_spacing": {
-    "philosophy": "Generous spacing. Bento Grids for galleries. Asymmetry and cinematic overlapping.",
-    "container_padding": "p-8 md:p-12 lg:p-20",
-    "grid_bento": "grid-cols-1 md:grid-cols-12 gap-8 md:gap-12",
-    "section_spacing": "py-24 md:py-32"
-  },
-  "surfaces_and_effects": {
-    "glassmorphism": "bg-[#1A1614]/70 backdrop-blur-xl border border-[#FDFBF7]/10",
-    "textures": "Grainy noise overlays using CSS or image on dark backgrounds to evoke analog film",
-    "shadows": "Ambient copper glow shadow-[0_8px_32px_rgba(178,105,65,0.15)]",
-    "borders": "1px solid #332A25 (soft warm border for dividing sections, not full boxes)"
-  },
-  "motion": {
-    "hover": "Subtle scale up (scale-105 for images), border color shift to #B26941",
-    "scroll": "Lenis smooth scroll is mandatory. Fade in up for content to simulate cinematic reveals."
+    "grid_system": "Bento Grid (Mode A: Tetris Grid) for Gallery and Projects. Asymmetrical, overlapping 'papers on a desk' feel. Use wide gaps (gap-8 to gap-12).",
+    "spacing_scale": "Generous spacing. p-8, p-12, py-24. Containers with borders MUST have p-6 or p-8.",
+    "alignment": "Left-aligned for textual content. Avoid perfect symmetry. Elements should feel slightly 'placed by hand' but snapping to a rigid mechanical grid."
   },
   "components": {
-    "nav": "Sticky glassmorphism header, visible links on desktop",
-    "buttons": "Flat background with copper accent, or outlined with text-[#B26941]. Hover state must be lighter copper.",
-    "cards": "Cardless or minimalistic containers. Do not use standard Shadcn bordered cards. Opt for editorial layout (e.g., image top, text below with no borders, just generous spacing).",
-    "forms": "Shadcn UI customized with #332A25 borders, #1A1614 backgrounds, and #B26941 focus rings"
+    "buttons": {
+      "primary": "Solid dark background (#1c1917), 1px solid #06b6d4 (cyan), cyan text, sharp corners. Hover: neon cyan box-shadow, text glow, and slight glitch effect.",
+      "secondary": "Solid background (#292524), 1px solid #78716c, vintage gold text (#fde047). Hover: border changes to #f59e0b with amber glow."
+    },
+    "cards": {
+      "style": "Retro-Futurism (Terminal Look): Background #1c1917, sharp corners (rounded-none), 1px border #44403c. Occasional scanline overlay. Padding p-6 or p-8.",
+      "hover": "Translate-y-[-2px], border color shifts to #06b6d4, subtle neon shadow."
+    },
+    "navigation": {
+      "style": "Sticky top, backdrop-blur-md, bg-stone-950/80, 1px bottom border of #44403c. Monospace links with amber hover states."
+    },
+    "inputs": {
+      "style": "Terminal style. bg-stone-900, border-b-2 border-stone-600, no rounded corners, focus:border-cyan-500, focus:outline-none, cyan text cursor."
+    }
   },
-  "media_and_images": {
+  "media": {
     "hero": {
-      "url": "https://images.pexels.com/photos/35042068/pexels-photo-35042068.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-      "alt": "Cinematic sunset view of ferries on Istanbul's Bosphorus with a moody silhouette effect.",
-      "usage": "Hero section background with dark gradient overlay (bg-gradient-to-t from-[#0F0D0C] via-[#0F0D0C]/70 to-transparent)"
+      "url": "https://images.pexels.com/photos/35378672/pexels-photo-35378672.jpeg",
+      "description": "Old-fashioned General computer. Used as main hero background with sepia tone and scanlines overlay."
     },
-    "about_profile": {
-      "url": "https://images.unsplash.com/photo-1578069244640-976a4135fada?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwxfHxjaW5lbWF0aWMlMjBwb3J0cmFpdCUyMG9sZGVyJTIwbWFuJTIwdHJhdmVsZXJ8ZW58MHx8fHwxNzc0OTkyMzYwfDA&ixlib=rb-4.1.0&q=85",
-      "alt": "Portrait of older man traveling with backpack",
-      "usage": "About section profile image. Make it tall (aspect-[3/4]) with subtle rounded corners."
+    "about": {
+      "url": "https://images.unsplash.com/photo-1724627561609-9cd3facba8d4",
+      "description": "A man holding an antique camera. Represents 'Zio Gio' examining the past/future."
     },
-    "gallery_travel": [
-      {
-        "url": "https://images.unsplash.com/photo-1763906667343-dcdb19b1ee4e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzR8MHwxfHNlYXJjaHwzfHxuYXBsZXMlMjBzdHJlZXQlMjBwaG90b2dyYXBoeSUyMHRyYXZlbHxlbnwwfHx8fDE3NzQ5OTIzMzR8MA&ixlib=rb-4.1.0&q=85",
-        "alt": "People walking down sunlit narrow street",
-        "title": "Naples Episodes"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1680096485726-18b85f93ec5e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzR8MHwxfHNlYXJjaHwxfHxuYXBsZXMlMjBzdHJlZXQlMjBwaG90b2dyYXBoeSUyMHRyYXZlbHxlbnwwfHx8fDE3NzQ5OTIzMzR8MA&ixlib=rb-4.1.0&q=85",
-        "alt": "Street scene",
-        "title": "Street Stories"
-      }
-    ],
-    "gallery_ai": [
-      {
-        "url": "https://images.pexels.com/photos/30575919/pexels-photo-30575919.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "alt": "Textured abstract art swirling brushstrokes sepia",
-        "title": "AI Art Exploration"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1770170389700-eb0f9b910ed8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzd8MHwxfHNlYXJjaHwxfHxhaSUyMGFydCUyMGFic3RyYWN0JTIwY29wcGVyJTIwc2VwaWF8ZW58MHx8fHwxNzc0OTkyMzM1fDA&ixlib=rb-4.1.0&q=85",
-        "alt": "Glowing orange blue background abstract",
-        "title": "Prompts in Copper"
-      }
-    ],
-    "texture": {
-      "url": "https://images.pexels.com/photos/18599094/pexels-photo-18599094.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-      "usage": "Optional overlay as a low opacity (e.g., 5-10%) background texture across main sections for film grain look. Add pointer-events-none."
+    "gallery_vintage_1": {
+      "url": "https://images.unsplash.com/photo-1769690093979-252e3b9a8fac",
+      "description": "Vintage photo booth portrait."
+    },
+    "gallery_vintage_2": {
+      "url": "https://images.unsplash.com/photo-1759405185723-02e6c84c9772",
+      "description": "Miner with headlamp, vintage grit."
+    },
+    "gallery_cyber_1": {
+      "url": "https://images.pexels.com/photos/8108560/pexels-photo-8108560.jpeg",
+      "description": "Woman in leather jacket with neon lights (cyberpunk contrast)."
+    },
+    "gallery_cyber_2": {
+      "url": "https://images.pexels.com/photos/28122495/pexels-photo-28122495.jpeg",
+      "description": "Vibrant neon lights in a dark setting."
+    },
+    "steampunk_machinery": {
+      "url": "https://images.unsplash.com/photo-1768268959053-770212976791",
+      "description": "Complex network of golden pipes. Useful for backgrounds or blog post thumbnails."
+    },
+    "vintage_tech": {
+      "url": "https://images.unsplash.com/photo-1735551031738-037221642171",
+      "description": "Bunch of old cameras on a glass table. Useful for project gallery."
     }
   },
   "instructions_to_main_agent": [
-    "Install and use `@fontsource/playfair-display` (or google fonts) for Headings and `@fontsource/outfit` for Body fonts.",
-    "Install `lucide-react` or `@phosphor-icons/react` for icons.",
-    "Implement `lenis` for smooth scrolling. This is crucial for the cinematic feel.",
-    "Use `framer-motion` for staggering entrance animations on the gallery items and text reveals.",
-    "For the hero section, overlay a heavy gradient `bg-gradient-to-t from-[#0F0D0C] via-[#0F0D0C]/60 to-transparent` over the image to ensure the text (H1: 'Racconto il mondo attraverso persone, luoghi e intelligenza artificiale') is readable.",
-    "Do NOT use generic Shadcn Card components without heavy customization. Make them look editorial (border-b only, or bento grid style with big photos).",
-    "Navigation must be visible on desktop, no hamburger until mobile.",
-    "Add `data-testid` to all interactive elements.",
-    "Include specific sections: Hero, About (Chi Sono - ex supermarket director turned creator, 'Il giro del mondo in...'), Projects/Series Gallery, AI Prompts Blog, Contact Form.",
-    "Make heavy use of wide gaps (gap-8, gap-12) and negative space.",
-    "Social links (Instagram, TikTok, Facebook) should be elegantly placed in header/footer.",
-    "The Contact form must look premium: bottom border inputs only (border-b) instead of full boxed inputs, or subtly filled dark inputs."
+    "Load fonts from Google Fonts: 'Special Elite', 'Space Mono', 'IBM Plex Mono'.",
+    "Use Lucide-react for icons, or install Phosphor if needed.",
+    "Implement a global CSS noise overlay (using a pseudo-element on the body) to give the entire site a subtle film grain.",
+    "For the Hero section, use the 'Old-fashioned General computer' image with a heavy sepia filter and an overlaid CSS scanline pattern. Text should look like a glowing terminal prompt or typewriter text over the image.",
+    "In the Gallery/Projects bento grid, apply a CSS filter `sepia(100%) grayscale(50%)` to the images by default. On hover, remove the filter and add a cyan bounding box with random hex codes (simulating AI facial/object recognition on old photos).",
+    "Use pure HTML/Tailwind for layouts. Shadcn components can be used for the Contact Form inputs, but they MUST be heavily customized to look like a terminal interface (sharp edges, monospace font, bottom borders instead of full boxes).",
+    "Avoid generic 'SaaS' animations. Use Framer Motion to create 'glitch' entrances (quick horizontal shifts, opacity flickers) rather than smooth fades.",
+    "Ensure all interactive elements have data-testid attributes.",
+    "The color palette is restricted: rely on Stone-900/950 for backgrounds, Stone-300 for text. Use Cyan-500 and Amber-500 strictly as 'electric/neon' accents against the analog background."
   ]
 }
