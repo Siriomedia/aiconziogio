@@ -1,0 +1,275 @@
+/* App specific retro-futuristic styles */
+
+/* Hero with vintage computer aesthetic */
+.hero-retro {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-retro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(180deg, rgba(12, 10, 9, 0.3) 0%, rgba(12, 10, 9, 0.9) 100%),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 50px 50px, 50px 50px;
+  z-index: 1;
+}
+
+/* Retro badge */
+.badge-retro {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid var(--neon-cyan);
+  padding: 6px 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+}
+
+/* Navigation retro style */
+.nav-retro {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  background: rgba(12, 10, 9, 0.85);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Gallery bento grid */
+.bento-retro {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .bento-retro {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento-retro {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+}
+
+.bento-retro > *:nth-child(3n+1) {
+  grid-column: span 2;
+}
+
+.bento-retro > *:nth-child(5n) {
+  grid-row: span 2;
+}
+
+/* Project card with vintage + neon */
+.project-retro {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.project-retro img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(60%) contrast(1.1);
+  transition: all 0.5s ease;
+}
+
+.project-retro:hover img {
+  filter: sepia(0%) contrast(1);
+}
+
+.project-retro:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+}
+
+.project-retro .overlay-data {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--neon-cyan);
+}
+
+.project-retro:hover .overlay-data {
+  opacity: 1;
+}
+
+/* Blog article retro */
+.article-retro {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.3s ease;
+}
+
+.article-retro:hover {
+  border-color: var(--neon-amber);
+  transform: translateY(-4px);
+}
+
+/* Social icon retro */
+.social-retro {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.social-retro:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
+/* Terminal header bar */
+.terminal-header {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: #ef4444; }
+.terminal-dot.yellow { background: #f59e0b; }
+.terminal-dot.green { background: #22c55e; }
+
+/* Timestamp style */
+.timestamp {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* Stats counter */
+.stat-retro {
+  text-align: left;
+}
+
+.stat-retro .value {
+  font-family: 'Space Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  line-height: 1;
+}
+
+.stat-retro .label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Hexadecimal decorative text */
+.hex-decoration {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+}
+
+/* Footer retro */
+.footer-retro {
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+/* Textarea terminal */
+.textarea-terminal {
+  background: var(--bg-base);
+  border: none;
+  border-bottom: 2px solid var(--border-subtle);
+  padding: 12px 0;
+  color: var(--text-primary);
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  resize: vertical;
+  min-height: 120px;
+  caret-color: var(--neon-cyan);
+  transition: border-color 0.3s ease;
+}
+
+.textarea-terminal:focus {
+  border-color: var(--neon-cyan);
+}
+
+/* Toast notification */
+.toast-retro {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--neon-cyan);
+  padding: 16px 24px;
+  z-index: 1000;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+}
+
+/* Random hex codes for AI detection */
+.hex-code {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--neon-cyan);
+  opacity: 0.7;
+}
+
+/* Vintage frame */
+.vintage-frame {
+  position: relative;
+  padding: 8px;
+  background: linear-gradient(135deg, #3d3426 0%, #2a2419 100%);
+  box-shadow: 
+    inset 0 0 20px rgba(0,0,0,0.5),
+    4px 4px 0px rgba(0,0,0,0.5);
+}
+
+.vintage-frame::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(253, 224, 71, 0.2);
+  pointer-events: none;
+}

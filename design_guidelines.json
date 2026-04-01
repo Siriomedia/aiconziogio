@@ -1,0 +1,121 @@
+{
+  "theme": "Dark",
+  "archetype": "Retro-Futurism (Steampunk meets Cyberpunk)",
+  "emotional_tone": "Nostalgic, mysterious, intellectual, analog warmth meeting digital artifacts",
+  "colors": {
+    "background": {
+      "base": "#0c0a09",
+      "surface": "#1c1917",
+      "surface_elevated": "#292524"
+    },
+    "text": {
+      "primary": "#e7e5e4",
+      "secondary": "#a8a29e",
+      "vintage_gold": "#fde047",
+      "muted": "#78716c"
+    },
+    "accents": {
+      "neon_cyan": "#06b6d4",
+      "neon_cyan_glow": "rgba(6, 182, 212, 0.5)",
+      "neon_amber": "#f59e0b",
+      "sepia_wash": "rgba(113, 63, 18, 0.3)"
+    },
+    "borders": {
+      "subtle": "#44403c",
+      "highlight": "#06b6d4"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "headings": "'Special Elite', monospace",
+      "subheadings": "'Space Mono', monospace",
+      "body": "'IBM Plex Mono', monospace"
+    },
+    "sizing": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "body": "text-base leading-relaxed",
+      "overline": "text-xs sm:text-sm tracking-[0.2em] uppercase"
+    }
+  },
+  "visual_enhancers": {
+    "textures": [
+      "Film grain overlay on backgrounds using SVG noise or a semi-transparent noise image.",
+      "Scanlines effect on specific 'digital' containers using repeating-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%) with background-size 100% 4px."
+    ],
+    "shadows": {
+      "neon_cyan": "0 0 10px rgba(6,182,212,0.3), 0 0 20px rgba(6,182,212,0.2)",
+      "neon_amber": "0 0 10px rgba(245,158,11,0.3), 0 0 20px rgba(245,158,11,0.2)",
+      "analog_depth": "4px 4px 0px rgba(0,0,0,0.8)"
+    },
+    "borders": "1px solid #44403c, often paired with an inner 1px border of #78716c for a skeuomorphic 'panel' feel.",
+    "effects": "Glitch hover effects (text shadow displacement: red/cyan), sepia filters (CSS filter: sepia(80%) hue-rotate(-10deg)) on images that clear on hover."
+  },
+  "layout_and_spacing": {
+    "grid_system": "Bento Grid (Mode A: Tetris Grid) for Gallery and Projects. Asymmetrical, overlapping 'papers on a desk' feel. Use wide gaps (gap-8 to gap-12).",
+    "spacing_scale": "Generous spacing. p-8, p-12, py-24. Containers with borders MUST have p-6 or p-8.",
+    "alignment": "Left-aligned for textual content. Avoid perfect symmetry. Elements should feel slightly 'placed by hand' but snapping to a rigid mechanical grid."
+  },
+  "components": {
+    "buttons": {
+      "primary": "Solid dark background (#1c1917), 1px solid #06b6d4 (cyan), cyan text, sharp corners. Hover: neon cyan box-shadow, text glow, and slight glitch effect.",
+      "secondary": "Solid background (#292524), 1px solid #78716c, vintage gold text (#fde047). Hover: border changes to #f59e0b with amber glow."
+    },
+    "cards": {
+      "style": "Retro-Futurism (Terminal Look): Background #1c1917, sharp corners (rounded-none), 1px border #44403c. Occasional scanline overlay. Padding p-6 or p-8.",
+      "hover": "Translate-y-[-2px], border color shifts to #06b6d4, subtle neon shadow."
+    },
+    "navigation": {
+      "style": "Sticky top, backdrop-blur-md, bg-stone-950/80, 1px bottom border of #44403c. Monospace links with amber hover states."
+    },
+    "inputs": {
+      "style": "Terminal style. bg-stone-900, border-b-2 border-stone-600, no rounded corners, focus:border-cyan-500, focus:outline-none, cyan text cursor."
+    }
+  },
+  "media": {
+    "hero": {
+      "url": "https://images.pexels.com/photos/35378672/pexels-photo-35378672.jpeg",
+      "description": "Old-fashioned General computer. Used as main hero background with sepia tone and scanlines overlay."
+    },
+    "about": {
+      "url": "https://images.unsplash.com/photo-1724627561609-9cd3facba8d4",
+      "description": "A man holding an antique camera. Represents 'Zio Gio' examining the past/future."
+    },
+    "gallery_vintage_1": {
+      "url": "https://images.unsplash.com/photo-1769690093979-252e3b9a8fac",
+      "description": "Vintage photo booth portrait."
+    },
+    "gallery_vintage_2": {
+      "url": "https://images.unsplash.com/photo-1759405185723-02e6c84c9772",
+      "description": "Miner with headlamp, vintage grit."
+    },
+    "gallery_cyber_1": {
+      "url": "https://images.pexels.com/photos/8108560/pexels-photo-8108560.jpeg",
+      "description": "Woman in leather jacket with neon lights (cyberpunk contrast)."
+    },
+    "gallery_cyber_2": {
+      "url": "https://images.pexels.com/photos/28122495/pexels-photo-28122495.jpeg",
+      "description": "Vibrant neon lights in a dark setting."
+    },
+    "steampunk_machinery": {
+      "url": "https://images.unsplash.com/photo-1768268959053-770212976791",
+      "description": "Complex network of golden pipes. Useful for backgrounds or blog post thumbnails."
+    },
+    "vintage_tech": {
+      "url": "https://images.unsplash.com/photo-1735551031738-037221642171",
+      "description": "Bunch of old cameras on a glass table. Useful for project gallery."
+    }
+  },
+  "instructions_to_main_agent": [
+    "Load fonts from Google Fonts: 'Special Elite', 'Space Mono', 'IBM Plex Mono'.",
+    "Use Lucide-react for icons, or install Phosphor if needed.",
+    "Implement a global CSS noise overlay (using a pseudo-element on the body) to give the entire site a subtle film grain.",
+    "For the Hero section, use the 'Old-fashioned General computer' image with a heavy sepia filter and an overlaid CSS scanline pattern. Text should look like a glowing terminal prompt or typewriter text over the image.",
+    "In the Gallery/Projects bento grid, apply a CSS filter `sepia(100%) grayscale(50%)` to the images by default. On hover, remove the filter and add a cyan bounding box with random hex codes (simulating AI facial/object recognition on old photos).",
+    "Use pure HTML/Tailwind for layouts. Shadcn components can be used for the Contact Form inputs, but they MUST be heavily customized to look like a terminal interface (sharp edges, monospace font, bottom borders instead of full boxes).",
+    "Avoid generic 'SaaS' animations. Use Framer Motion to create 'glitch' entrances (quick horizontal shifts, opacity flickers) rather than smooth fades.",
+    "Ensure all interactive elements have data-testid attributes.",
+    "The color palette is restricted: rely on Stone-900/950 for backgrounds, Stone-300 for text. Use Cyan-500 and Amber-500 strictly as 'electric/neon' accents against the analog background."
+  ]
+}
