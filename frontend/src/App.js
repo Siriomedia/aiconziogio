@@ -16,7 +16,7 @@ const SOCIAL_LINKS = {
 };
 
 // Zio Gio's real photo
-const ZIO_GIO_PHOTO = "https://customer-assets.emergentagent.com/job_uncle-gio-travels/artifacts/gkck3070_hf_20260331_220644_7113f2c9-864d-4462-ae50-5eb5b049df26.png";
+const ZIO_GIO_PHOTO = "/zio-gio.jpg";
 
 // TikTok Icon
 const TikTokIcon = ({ size = 20 }) => (
