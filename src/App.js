@@ -303,7 +303,7 @@ const AboutSection = () => {
             <div className="terminal-card p-8 mb-8">
               <div className="space-y-6 text-stone-400 font-mono text-sm leading-relaxed">
                 <p>
-                  <span className="text-cyan-500">{'>'}</span> Mi chiamo Gio, ma tutti mi chiamano <span className="text-amber-400">Zio Gio</span>. 
+                  <span className="text-cyan-500">{'>'}</span> Mi chiamo Giovanni, ma tutti mi chiamano <span className="text-amber-400">Zio Gio</span>. 
                   Dal mio studio a Napoli, con il Vesuvio come sfondo, creo contenuti che mescolano 
                   <span className="text-cyan-400"> tecnologia</span> e <span className="text-amber-400">storytelling</span>.
                 </p>
