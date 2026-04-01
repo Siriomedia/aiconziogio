@@ -47,7 +47,6 @@ let webpackConfig = {
             '**/build/**',
             '**/dist/**',
             '**/coverage/**',
-            '**/public/**',
         ],
       };
 
