@@ -26,9 +26,11 @@ FROM nginx:alpine
 # Copy built assets
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Copy nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy nginx config as template
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-EXPOSE 80
+# Railway sets $PORT dynamically; envsubst sostituisce ${PORT} nel template
+ENV PORT=80
+EXPOSE ${PORT}
 
 CMD ["nginx", "-g", "daemon off;"]
