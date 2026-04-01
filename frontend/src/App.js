@@ -16,7 +16,7 @@ const SOCIAL_LINKS = {
 };
 
 // Zio Gio's real photo
-const ZIO_GIO_PHOTO = "/zio-gio.jpg";
+const ZIO_GIO_PHOTO = "/zio-gio.png";
 
 // TikTok Icon
 const TikTokIcon = ({ size = 20 }) => (
