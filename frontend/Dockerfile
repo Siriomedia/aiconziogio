@@ -4,10 +4,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN yarn install
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -18,7 +18,7 @@ ARG REACT_APP_BACKEND_URL
 ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
 
 # Build the React app
-RUN yarn build
+RUN npm run build
 
 # ---- Production stage ----
 FROM nginx:alpine
