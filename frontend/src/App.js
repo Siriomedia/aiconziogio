@@ -1,19 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext, useContext } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+import AdminPanel from "@/components/AdminPanel";
+import { BrowserRouter, Routes, Route, Link, useLocation, Outlet } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import Lenis from 'lenis';
-import { Instagram, Facebook, Mail, Menu, X, Terminal, Cpu, ScanLine, Zap, Clock, ArrowRight, MessageCircle } from "lucide-react";
+import { Instagram, Facebook, Mail, Menu, X, Terminal, Cpu, ScanLine, Zap, Clock, ArrowRight, MessageCircle, Play, Lock } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const SOCIAL_LINKS = {
-  instagram: "https://instagram.com/aiconziogio",
-  facebook: "https://facebook.com/profile.php?id=100084321234567",
-  tiktok: "https://tiktok.com/@aiconziogio"
+// ─── Site Settings Context ───────────────────────────────────────────────────
+const DEFAULT_SETTINGS = {
+  hero_title: "E se l'AI fosse esistita nel passato?",
+  hero_subtitle: "Viaggio attraverso il tempo con l'intelligenza artificiale. Storie di ieri raccontate con la tecnologia di domani.",
+  hero_image_url: "https://images.pexels.com/photos/35378672/pexels-photo-35378672.jpeg?auto=compress&cs=tinysrgb&w=1920",
+  about_title: "Content Creator con vista Vesuvio",
+  about_bio_1: "Mi chiamo Giovanni, ma tutti mi chiamano Zio Gio. Dal mio studio a Napoli, con il Vesuvio come sfondo, creo contenuti che mescolano tecnologia e storytelling.",
+  about_bio_2: "Uso l'intelligenza artificiale per immaginare mondi dove passato e futuro si incontrano. I miei prompt creano visioni di come sarebbe stato il mondo se l'AI fosse esistita ieri.",
+  about_bio_3: 'Il progetto "Il giro del mondo in..." nasce da questa passione: raccontare storie attraverso persone, luoghi e tecnologia.',
+  stat_followers: "5K+",
+  stat_stories: "50+",
+  stat_prompts: "\u221e",
+  social_instagram: "https://instagram.com/aiconziogio",
+  social_tiktok: "https://tiktok.com/@aiconziogio",
+  social_facebook: "https://facebook.com/profile.php?id=100084321234567",
+  contact_email: "aiconziogio@gmail.com",
+  contact_whatsapp: "+39 329 162 4908",
+  footer_text: "ZIO_GIO // AI_STORYTELLER",
 };
+
+const SiteSettingsContext = createContext(DEFAULT_SETTINGS);
+const useSiteSettings = () => useContext(SiteSettingsContext);
 
 // Zio Gio's real photo
 const ZIO_GIO_PHOTO = "/zio-gio.png";
@@ -59,6 +77,7 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const settings = useSiteSettings();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -128,13 +147,13 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-instagram">
+            <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-instagram">
               <Instagram size={16} />
             </a>
-            <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-tiktok">
+            <a href={settings.social_tiktok} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-tiktok">
               <TikTokIcon size={16} />
             </a>
-            <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-facebook">
+            <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="social-retro" data-testid="social-facebook">
               <Facebook size={16} />
             </a>
           </div>
@@ -170,6 +189,7 @@ const Navigation = () => {
 // Hero Section
 const HeroSection = () => {
   const [time, setTime] = useState(new Date());
+  const settings = useSiteSettings();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -180,7 +200,7 @@ const HeroSection = () => {
     <section data-testid="hero-section" className="hero-retro scanlines">
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.pexels.com/photos/35378672/pexels-photo-35378672.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          src={settings.hero_image_url}
           alt="Vintage computer terminal"
           className="w-full h-full object-cover opacity-40"
           style={{ filter: 'sepia(70%) contrast(1.2)' }}
@@ -210,17 +230,11 @@ const HeroSection = () => {
             className="text-4xl md:text-6xl lg:text-7xl font-typewriter leading-tight mb-8 glitch-text-hover"
             data-testid="hero-title"
           >
-            <span className="text-stone-200">E se l'</span>
-            <span className="text-cyan-400 text-glow-cyan">AI</span>
-            <span className="text-stone-200"> fosse esistita </span>
-            <br />
-            <span className="text-amber-400 text-glow-amber">nel passato</span>
-            <span className="text-stone-200">?</span>
+            {settings.hero_title}
           </motion.h1>
 
           <motion.p variants={glitchIn} className="text-lg md:text-xl text-stone-400 font-mono mb-10 max-w-2xl leading-relaxed">
-            Viaggio attraverso il tempo con l'intelligenza artificiale. 
-            Storie di ieri raccontate con la tecnologia di domani.
+            {settings.hero_subtitle}
             <span className="cursor-blink"></span>
           </motion.p>
 
@@ -252,6 +266,7 @@ const HeroSection = () => {
 
 // About Section
 const AboutSection = () => {
+  const settings = useSiteSettings();
   return (
     <section id="about" data-testid="about-section" className="section bg-stone-950">
       <div className="container-custom">
@@ -297,39 +312,28 @@ const AboutSection = () => {
             <p className="label-terminal mb-4">{'>'} ACCESS_FILE: BIO.TXT</p>
             
             <h2 className="text-3xl md:text-4xl font-typewriter mb-8" data-testid="about-title">
-              Content Creator con vista <span className="text-cyan-400">Vesuvio</span>
+              {settings.about_title}
             </h2>
 
             <div className="terminal-card p-8 mb-8">
               <div className="space-y-6 text-stone-400 font-mono text-sm leading-relaxed">
-                <p>
-                  <span className="text-cyan-500">{'>'}</span> Mi chiamo Giovanni, ma tutti mi chiamano <span className="text-amber-400">Zio Gio</span>. 
-                  Dal mio studio a Napoli, con il Vesuvio come sfondo, creo contenuti che mescolano 
-                  <span className="text-cyan-400"> tecnologia</span> e <span className="text-amber-400">storytelling</span>.
-                </p>
-                <p>
-                  <span className="text-cyan-500">{'>'}</span> Uso l'<span className="text-cyan-400">intelligenza artificiale</span> per 
-                  immaginare mondi dove passato e futuro si incontrano. I miei prompt creano 
-                  visioni di come sarebbe stato il mondo se l'AI fosse esistita ieri.
-                </p>
-                <p>
-                  <span className="text-cyan-500">{'>'}</span> Il progetto <span className="text-amber-400">"Il giro del mondo in..."</span> nasce 
-                  da questa passione: raccontare storie attraverso persone, luoghi e tecnologia.
-                </p>
+                <p><span className="text-cyan-500">{'>'}</span> {settings.about_bio_1}</p>
+                <p><span className="text-cyan-500">{'>'}</span> {settings.about_bio_2}</p>
+                <p><span className="text-cyan-500">{'>'}</span> {settings.about_bio_3}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-6">
               <div className="stat-retro">
-                <div className="value">5K+</div>
+                <div className="value">{settings.stat_followers}</div>
                 <div className="label">Followers</div>
               </div>
               <div className="stat-retro">
-                <div className="value text-amber-400">50+</div>
+                <div className="value text-amber-400">{settings.stat_stories}</div>
                 <div className="label">Storie</div>
               </div>
               <div className="stat-retro">
-                <div className="value text-cyan-400">∞</div>
+                <div className="value text-cyan-400">{settings.stat_prompts}</div>
                 <div className="label">Prompt AI</div>
               </div>
             </div>
@@ -343,15 +347,20 @@ const AboutSection = () => {
 // Instagram Feed Section
 const ProjectsSection = () => {
   const [instaData, setInstaData] = useState({ posts: [], is_configured: false, profile_url: 'https://instagram.com/aiconziogio', username: 'aiconziogio' });
+  const [reels, setReels] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFeed = async () => {
       try {
-        const response = await axios.get(`${API}/instagram`);
-        setInstaData(response.data);
+        const [instaRes, reelsRes] = await Promise.allSettled([
+          axios.get(`${API}/instagram`),
+          axios.get(`${API}/reels`),
+        ]);
+        if (instaRes.status === 'fulfilled') setInstaData(instaRes.value.data);
+        if (reelsRes.status === 'fulfilled') setReels(reelsRes.value.data);
       } catch {
-        // silent fail, mostra fallback
+        // silent fail
       } finally {
         setLoading(false);
       }
@@ -517,6 +526,91 @@ const ProjectsSection = () => {
             </a>
           </motion.div>
         )}
+
+        {/* ─── Reels salvati ─── */}
+        {reels.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20"
+          >
+            <div className="mb-8">
+              <p className="label-terminal mb-4">{'>'} REEL_ARCHIVE...</p>
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                <h3 className="text-2xl md:text-4xl font-typewriter">
+                  <span className="text-stone-200">Reel </span>
+                  <span className="text-amber-400">Selezionati</span>
+                </h3>
+                <a
+                  href={instaData.profile_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 font-terminal text-sm text-stone-400 hover:text-amber-400 transition-colors border border-stone-700 hover:border-amber-500 px-4 py-2 self-start"
+                >
+                  <Play size={12} />
+                  Tutti i reel
+                </a>
+              </div>
+            </div>
+            <motion.div
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {reels.map((reel, idx) => (
+                <motion.a
+                  key={reel.id}
+                  href={reel.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variants={glitchIn}
+                  className="group relative aspect-[9/16] overflow-hidden block bg-stone-800 border border-stone-700 hover:border-amber-500/60 transition-colors"
+                  data-testid={`reel-${idx}`}
+                >
+                  {reel.thumbnail_url ? (
+                    <img
+                      src={reel.thumbnail_url}
+                      alt={reel.title || `Reel ${idx + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-stone-700/80 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors">
+                        <Play size={20} className="text-stone-400 group-hover:text-amber-400 transition-colors" />
+                      </div>
+                    </div>
+                  )}
+                  {/* Scanlines */}
+                  <div className="absolute inset-0 pointer-events-none opacity-10" style={{
+                    backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 4px)'
+                  }} />
+                  {/* Badge */}
+                  <div className="absolute top-2 left-2">
+                    <span className="font-terminal text-[9px] text-amber-400 bg-stone-950/80 px-1.5 py-0.5">
+                      REEL_{String(idx + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-stone-950/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                    {reel.title && (
+                      <p className="font-typewriter text-stone-200 text-xs leading-tight mb-1 line-clamp-2">{reel.title}</p>
+                    )}
+                    {reel.description && (
+                      <p className="font-mono text-[10px] text-stone-400 leading-relaxed line-clamp-3">{reel.description}</p>
+                    )}
+                    <div className="flex items-center gap-1 mt-2 text-amber-400 font-terminal text-[9px]">
+                      <Play size={8} />
+                      <span>APRI REEL</span>
+                    </div>
+                  </div>
+                </motion.a>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
       </div>
     </section>
   );
@@ -524,6 +618,7 @@ const ProjectsSection = () => {
 
 // Contact Section
 const ContactSection = () => {
+  const settings = useSiteSettings();
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState({ loading: false, success: false, error: null });
 
@@ -560,22 +655,22 @@ const ContactSection = () => {
             </p>
 
             <div className="space-y-4">
-              <a href="mailto:aiconziogio@gmail.com" className="flex items-center gap-4 text-stone-500 hover:text-cyan-400 transition-colors font-mono text-sm">
+              <a href={`mailto:${settings.contact_email}`} className="flex items-center gap-4 text-stone-500 hover:text-cyan-400 transition-colors font-mono text-sm">
                 <Mail size={18} />
-                aiconziogio@gmail.com
+                {settings.contact_email}
               </a>
-              <a href="https://wa.me/393291624908" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-stone-500 hover:text-green-400 transition-colors font-mono text-sm">
+              <a href={`https://wa.me/${settings.contact_whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-stone-500 hover:text-green-400 transition-colors font-mono text-sm">
                 <MessageCircle size={18} />
-                +39 329 162 4908
+                {settings.contact_whatsapp}
               </a>
               <div className="flex items-center gap-4 pt-4">
-                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="social-retro">
+                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="social-retro">
                   <Instagram size={16} />
                 </a>
-                <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="social-retro">
+                <a href={settings.social_tiktok} target="_blank" rel="noopener noreferrer" className="social-retro">
                   <TikTokIcon size={16} />
                 </a>
-                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="social-retro">
+                <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="social-retro">
                   <Facebook size={16} />
                 </a>
               </div>
@@ -663,31 +758,53 @@ const ContactSection = () => {
 };
 
 // Footer
-const Footer = () => (
-  <footer className="footer-retro py-12" data-testid="footer">
-    <div className="container-custom">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <Terminal size={18} className="text-cyan-500" />
-          <span className="font-terminal text-sm">ZIO_GIO // AI_STORYTELLER</span>
+const Footer = () => {
+  const settings = useSiteSettings();
+  return (
+    <footer className="footer-retro py-12" data-testid="footer">
+      <div className="container-custom">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <Terminal size={18} className="text-cyan-500" />
+            <span className="font-terminal text-sm">{settings.footer_text}</span>
+          </div>
+          <p className="text-xs text-stone-600 font-mono">
+            © 1955-2026 // TEMPORAL_RIGHTS_RESERVED
+          </p>
+          <div className="flex items-center gap-4">
+            <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
+              <Instagram size={16} />
+            </a>
+            <a href={settings.social_tiktok} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
+              <TikTokIcon size={16} />
+            </a>
+            <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
+              <Facebook size={16} />
+            </a>
+          </div>
         </div>
-        <p className="text-xs text-stone-600 font-mono">
-          © 1955-2026 // TEMPORAL_RIGHTS_RESERVED
-        </p>
-        <div className="flex items-center gap-4">
-          <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
-            <Instagram size={16} />
-          </a>
-          <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
-            <TikTokIcon size={16} />
-          </a>
-          <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="text-stone-600 hover:text-cyan-400 transition-colors">
-            <Facebook size={16} />
-          </a>
+        <div className="mt-6 pt-4 border-t border-stone-900 flex justify-end">
+          <Link
+            to="/admin"
+            title="Pannello Admin"
+            className="flex items-center gap-1.5 font-terminal text-[10px] text-stone-600 hover:text-cyan-400 transition-colors group"
+          >
+            <Lock size={11} className="group-hover:text-cyan-400 transition-colors" />
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity">ADMIN</span>
+          </Link>
         </div>
       </div>
-    </div>
-  </footer>
+    </footer>
+  );
+};
+
+// Public Layout (Navigation + content + Footer)
+const PublicLayout = () => (
+  <>
+    <Navigation />
+    <Outlet />
+    <Footer />
+  </>
 );
 
 // Home Page
@@ -933,19 +1050,30 @@ const BlogPostPage = () => {
 
 // Main App
 function App() {
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    axios.get(`${API}/settings`)
+      .then((r) => setSettings({ ...DEFAULT_SETTINGS, ...r.data }))
+      .catch(() => {});
+  }, []);
+
   return (
-    <div className="App min-h-screen bg-stone-950">
-      <BrowserRouter>
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:slug" element={<BlogPostPage />} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
-    </div>
+    <SiteSettingsContext.Provider value={settings}>
+      <div className="App min-h-screen bg-stone-950">
+        <BrowserRouter>
+          <Routes>
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
+            </Route>
+            <Route path="/admin" element={<AdminPanel />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </SiteSettingsContext.Provider>
   );
 }
 

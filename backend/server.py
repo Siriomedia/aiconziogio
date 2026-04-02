@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,6 +6,7 @@ import os
 import logging
 import asyncio
 import aiohttp
+import secrets
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
@@ -34,6 +35,10 @@ INSTAGRAM_USERNAME = os.environ.get('INSTAGRAM_USERNAME', 'aiconziogio')
 if not IS_EMAIL_MOCKED:
     import resend
     resend.api_key = RESEND_API_KEY
+
+# Admin configuration
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+admin_tokens: set = set()
 
 # Create the main app
 app = FastAPI()
@@ -96,6 +101,82 @@ class GalleryItem(BaseModel):
     description: Optional[str] = None
     prompt_text: Optional[str] = None
     order: int = 0
+
+class SiteSettings(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    id: str = "main"
+    hero_title: str = "E se l'AI fosse esistita nel passato?"
+    hero_subtitle: str = "Viaggio attraverso il tempo con l'intelligenza artificiale. Storie di ieri raccontate con la tecnologia di domani."
+    hero_image_url: str = "https://images.pexels.com/photos/35378672/pexels-photo-35378672.jpeg?auto=compress&cs=tinysrgb&w=1920"
+    about_title: str = "Content Creator con vista Vesuvio"
+    about_bio_1: str = "Mi chiamo Giovanni, ma tutti mi chiamano Zio Gio. Dal mio studio a Napoli, con il Vesuvio come sfondo, creo contenuti che mescolano tecnologia e storytelling."
+    about_bio_2: str = "Uso l'intelligenza artificiale per immaginare mondi dove passato e futuro si incontrano. I miei prompt creano visioni di come sarebbe stato il mondo se l'AI fosse esistita ieri."
+    about_bio_3: str = 'Il progetto "Il giro del mondo in..." nasce da questa passione: raccontare storie attraverso persone, luoghi e tecnologia.'
+    stat_followers: str = "5K+"
+    stat_stories: str = "50+"
+    stat_prompts: str = "\u221e"
+    social_instagram: str = "https://instagram.com/aiconziogio"
+    social_tiktok: str = "https://tiktok.com/@aiconziogio"
+    social_facebook: str = "https://facebook.com/profile.php?id=100084321234567"
+    contact_email: str = "aiconziogio@gmail.com"
+    contact_whatsapp: str = "+39 329 162 4908"
+    footer_text: str = "ZIO_GIO // AI_STORYTELLER"
+
+class AdminLoginRequest(BaseModel):
+    password: str
+
+class BlogPostCreate(BaseModel):
+    title: str
+    slug: str
+    excerpt: str
+    content: str
+    prompt_text: Optional[str] = None
+    image_url: Optional[str] = None
+    category: str = "prompt"
+    published: bool = True
+
+class GalleryItemCreate(BaseModel):
+    title: str
+    image_url: str
+    category: str
+    description: Optional[str] = None
+    prompt_text: Optional[str] = None
+    order: int = 0
+
+class ProjectCreate(BaseModel):
+    title: str
+    slug: str
+    description: str
+    image_url: str
+    video_url: Optional[str] = None
+    category: str
+    order: int = 0
+
+class InstagramReel(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    url: str
+    thumbnail_url: Optional[str] = None
+    description: Optional[str] = None
+    order: int = 0
+    published: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class InstagramReelCreate(BaseModel):
+    title: str
+    url: str
+    thumbnail_url: Optional[str] = None
+    description: Optional[str] = None
+    order: int = 0
+    published: bool = True
+
+# ============ ADMIN AUTH ============
+
+async def verify_admin(x_admin_token: Optional[str] = Header(None)):
+    if not x_admin_token or x_admin_token not in admin_tokens:
+        raise HTTPException(status_code=401, detail="Non autorizzato")
+    return x_admin_token
 
 # ============ ROUTES ============
 
@@ -222,10 +303,31 @@ async def get_gallery(category: Optional[str] = None):
     items = await db.gallery.find(query, {"_id": 0}).sort("order", 1).to_list(100)
     return items
 
+# Instagram Reels (manually curated)
+@api_router.get("/reels")
+async def get_reels():
+    items = await db.instagram_reels.find({"published": True}, {"_id": 0}).sort("order", 1).to_list(50)
+    for item in items:
+        if isinstance(item.get('created_at'), str):
+            try:
+                item['created_at'] = datetime.fromisoformat(item['created_at'])
+            except Exception:
+                pass
+    return items
+
 # Seed Data endpoint
 @api_router.post("/seed")
-async def seed_data():
-    # Clear existing data
+async def seed_data(force: bool = False):
+    """Seed example data. By default only seeds if the collection is empty.
+    Pass ?force=true to overwrite existing data."""
+    blog_count = await db.blog_posts.count_documents({})
+    proj_count = await db.projects.count_documents({})
+    gall_count = await db.gallery.count_documents({})
+
+    if not force and (blog_count > 0 or proj_count > 0 or gall_count > 0):
+        return {"status": "skipped", "message": "Database già popolato. Usa ?force=true per sovrascrivere."}
+
+    # Clear existing data only if forcing
     await db.blog_posts.delete_many({})
     await db.projects.delete_many({})
     await db.gallery.delete_many({})
@@ -362,8 +464,163 @@ Uso colori caldi e luci naturali per creare atmosfere autentiche che ricordano i
     
     return {"status": "success", "message": "Dati di esempio caricati"}
 
+# ============ ADMIN ROUTER ============
+
+admin_router = APIRouter(prefix="/api/admin")
+
+@admin_router.post("/login")
+async def admin_login(body: AdminLoginRequest):
+    if body.password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Password errata")
+    token = secrets.token_urlsafe(32)
+    admin_tokens.add(token)
+    return {"token": token}
+
+# Settings
+@admin_router.get("/settings")
+async def admin_get_settings(token: str = Depends(verify_admin)):
+    doc = await db.site_settings.find_one({"id": "main"}, {"_id": 0})
+    if not doc:
+        default = SiteSettings()
+        d = default.model_dump()
+        await db.site_settings.insert_one(d)
+        return d
+    return doc
+
+@admin_router.put("/settings")
+async def admin_update_settings(request: Request, token: str = Depends(verify_admin)):
+    data = await request.json()
+    data["id"] = "main"
+    await db.site_settings.replace_one({"id": "main"}, data, upsert=True)
+    return {"status": "ok"}
+
+# Blog CRUD
+@admin_router.get("/blog")
+async def admin_get_blog(token: str = Depends(verify_admin)):
+    posts = await db.blog_posts.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
+    return posts
+
+@admin_router.post("/blog")
+async def admin_create_blog(post: BlogPostCreate, token: str = Depends(verify_admin)):
+    doc = post.model_dump()
+    doc["id"] = str(uuid.uuid4())
+    doc["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.blog_posts.insert_one(doc)
+    return {"status": "ok", "id": doc["id"]}
+
+@admin_router.put("/blog/{post_id}")
+async def admin_update_blog(post_id: str, post: BlogPostCreate, token: str = Depends(verify_admin)):
+    result = await db.blog_posts.update_one({"id": post_id}, {"$set": post.model_dump()})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Post non trovato")
+    return {"status": "ok"}
+
+@admin_router.delete("/blog/{post_id}")
+async def admin_delete_blog(post_id: str, token: str = Depends(verify_admin)):
+    result = await db.blog_posts.delete_one({"id": post_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Post non trovato")
+    return {"status": "ok"}
+
+# Gallery CRUD
+@admin_router.get("/gallery")
+async def admin_get_gallery(token: str = Depends(verify_admin)):
+    items = await db.gallery.find({}, {"_id": 0}).sort("order", 1).to_list(200)
+    return items
+
+@admin_router.post("/gallery")
+async def admin_create_gallery(item: GalleryItemCreate, token: str = Depends(verify_admin)):
+    doc = item.model_dump()
+    doc["id"] = str(uuid.uuid4())
+    await db.gallery.insert_one(doc)
+    return {"status": "ok", "id": doc["id"]}
+
+@admin_router.put("/gallery/{item_id}")
+async def admin_update_gallery(item_id: str, item: GalleryItemCreate, token: str = Depends(verify_admin)):
+    result = await db.gallery.update_one({"id": item_id}, {"$set": item.model_dump()})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Elemento non trovato")
+    return {"status": "ok"}
+
+@admin_router.delete("/gallery/{item_id}")
+async def admin_delete_gallery(item_id: str, token: str = Depends(verify_admin)):
+    result = await db.gallery.delete_one({"id": item_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Elemento non trovato")
+    return {"status": "ok"}
+
+# Projects CRUD
+@admin_router.get("/projects")
+async def admin_get_projects(token: str = Depends(verify_admin)):
+    projects = await db.projects.find({}, {"_id": 0}).sort("order", 1).to_list(200)
+    return projects
+
+@admin_router.post("/projects")
+async def admin_create_project(project: ProjectCreate, token: str = Depends(verify_admin)):
+    doc = project.model_dump()
+    doc["id"] = str(uuid.uuid4())
+    await db.projects.insert_one(doc)
+    return {"status": "ok", "id": doc["id"]}
+
+@admin_router.put("/projects/{project_id}")
+async def admin_update_project(project_id: str, project: ProjectCreate, token: str = Depends(verify_admin)):
+    result = await db.projects.update_one({"id": project_id}, {"$set": project.model_dump()})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Progetto non trovato")
+    return {"status": "ok"}
+
+@admin_router.delete("/projects/{project_id}")
+async def admin_delete_project(project_id: str, token: str = Depends(verify_admin)):
+    result = await db.projects.delete_one({"id": project_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Progetto non trovato")
+    return {"status": "ok"}
+
+# Messages (read only)
+@admin_router.get("/messages")
+async def admin_get_messages(token: str = Depends(verify_admin)):
+    messages = await db.contact_messages.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
+    return messages
+
+# Reels CRUD
+@admin_router.get("/reels")
+async def admin_get_reels(token: str = Depends(verify_admin)):
+    items = await db.instagram_reels.find({}, {"_id": 0}).sort("order", 1).to_list(200)
+    return items
+
+@admin_router.post("/reels")
+async def admin_create_reel(reel: InstagramReelCreate, token: str = Depends(verify_admin)):
+    doc = reel.model_dump()
+    doc["id"] = str(uuid.uuid4())
+    doc["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.instagram_reels.insert_one(doc)
+    return {"status": "ok", "id": doc["id"]}
+
+@admin_router.put("/reels/{reel_id}")
+async def admin_update_reel(reel_id: str, reel: InstagramReelCreate, token: str = Depends(verify_admin)):
+    result = await db.instagram_reels.update_one({"id": reel_id}, {"$set": reel.model_dump()})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Reel non trovato")
+    return {"status": "ok"}
+
+@admin_router.delete("/reels/{reel_id}")
+async def admin_delete_reel(reel_id: str, token: str = Depends(verify_admin)):
+    result = await db.instagram_reels.delete_one({"id": reel_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Reel non trovato")
+    return {"status": "ok"}
+
+# Public settings endpoint
+@api_router.get("/settings")
+async def get_public_settings():
+    doc = await db.site_settings.find_one({"id": "main"}, {"_id": 0})
+    if not doc:
+        return SiteSettings().model_dump()
+    return doc
+
 # Include the router in the main app
 app.include_router(api_router)
+app.include_router(admin_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -372,6 +629,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup_event():
+    """Auto-initialize site settings on first run (non-destructive)."""
+    existing = await db.site_settings.find_one({"id": "main"})
+    if not existing:
+        default = SiteSettings()
+        await db.site_settings.insert_one(default.model_dump())
+        logger.info("[STARTUP] Impostazioni del sito inizializzate con i valori di default.")
+    else:
+        logger.info("[STARTUP] Impostazioni del sito già presenti nel database.")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

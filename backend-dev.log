@@ -1,0 +1,7 @@
+INFO:     Will watch for changes in these directories: ['D:\\aiconziogio-main\\aiconziogio-main']
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     Started reloader process [3108] using WatchFiles
+INFO:     Started server process [15876]
+INFO:     Waiting for application startup.
+2026-04-02 18:34:00,165 - backend.server - INFO - [STARTUP] Impostazioni del sito giÓ presenti nel database.
+INFO:     Application startup complete.
