@@ -787,10 +787,10 @@ const Footer = () => {
           <Link
             to="/admin"
             title="Pannello Admin"
-            className="flex items-center gap-1.5 font-terminal text-[10px] text-stone-600 hover:text-cyan-400 transition-colors group"
+            className="flex items-center gap-1.5 font-terminal text-[10px] text-stone-500 hover:text-cyan-400 transition-colors group border border-stone-700 hover:border-cyan-500/50 px-2 py-1"
           >
-            <Lock size={11} className="group-hover:text-cyan-400 transition-colors" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">ADMIN</span>
+            <Lock size={10} />
+            <span>ADMIN</span>
           </Link>
         </div>
       </div>
