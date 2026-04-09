@@ -17,8 +17,8 @@ COPY . .
 ARG REACT_APP_BACKEND_URL
 ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
 
-# Build the React app
-RUN npm run build
+# Build the React app (NODE_OPTIONS prevents OOM on memory-constrained CI/Railway)
+RUN NODE_OPTIONS=--max_old_space_size=4096 npm run build
 
 # ---- Production stage ----
 FROM nginx:alpine
@@ -26,11 +26,16 @@ FROM nginx:alpine
 # Copy built assets
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Copy nginx config as template
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+# Copy nginx config as a template (not into templates/ dir – we substitute manually)
+COPY nginx.conf /etc/nginx/nginx.conf.template
 
-# Railway sets $PORT dynamically; envsubst sostituisce ${PORT} nel template
+# Entrypoint: substitute ONLY ${PORT}, then start nginx
+# This avoids envsubst accidentally overwriting nginx variables like $uri, $host, etc.
+RUN printf '#!/bin/sh\nenvsubst '"'"'${PORT}'"'"' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf\nexec nginx -g "daemon off;"\n' > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+# Railway sets $PORT at runtime; default 80 for local testing
 ENV PORT=80
-EXPOSE ${PORT}
+EXPOSE $PORT
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/entrypoint.sh"]

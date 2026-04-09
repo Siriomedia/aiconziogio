@@ -9,3 +9,7 @@ __pycache__/
 .gitignore
 *.md
 test_*
+# Accidental files
+=*
+*.log
+*.txt.bak

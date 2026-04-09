@@ -6,7 +6,7 @@ import {
   Terminal, Settings, FileText, Image, Layers, Mail,
   LogOut, Plus, Edit2, Trash2, Save, X, Eye, EyeOff,
   ChevronRight, Database, ArrowLeft, CheckCircle, AlertCircle,
-  Globe, Play
+  Globe, Play, Cpu, Square, Mic
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -910,6 +910,237 @@ const ReelsSection = ({ showToast }) => {
   );
 };
 
+// ─── Avatar AI Section ─────────────────────────────────────────────
+const AvatarSection = ({ showToast }) => {
+  const [settings, setSettings] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [showOAKey, setShowOAKey] = useState(false);
+  const [showELKey, setShowELKey] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState(null);
+
+  useEffect(() => {
+    adminApi.get("/settings")
+      .then((r) => setSettings(r.data))
+      .catch(() => showToast("Errore caricamento impostazioni avatar", "error"));
+  }, []);
+
+  const set = (key, val) => setSettings((s) => ({ ...s, [key]: val }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    setTestResult(null);
+    try {
+      await adminApi.put("/settings", settings);
+      showToast("Impostazioni Avatar salvate!");
+    } catch {
+      showToast("Errore durante il salvataggio", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    setTestResult(null);
+    // Prima salva le impostazioni
+    try {
+      await adminApi.put("/settings", settings);
+    } catch {
+      showToast("Salva prima le impostazioni", "error");
+      setTesting(false);
+      return;
+    }
+    try {
+      const { data } = await axios.post(`${BACKEND_URL}/api/avatar/chat`, {
+        message: "Ciao! Presentati brevemente.",
+        history: [],
+        request_id: `test_${Date.now()}`,
+      });
+      if (data.cancelled) {
+        setTestResult({ ok: false, text: "Richiesta annullata." });
+      } else {
+        setTestResult({ ok: true, text: data.response });
+      }
+    } catch (err) {
+      const detail = err.response?.data?.detail || err.message;
+      setTestResult({ ok: false, text: detail });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  if (!settings) return <div className="flex justify-center py-20"><div className="loading-terminal" /></div>;
+
+  return (
+    <div className="space-y-6">
+      {/* Stato Avatar */}
+      <div className="terminal-card p-6">
+        <h3 className="font-terminal text-xs text-cyan-400 mb-5 tracking-widest">{'>'} STATO AVATAR</h3>
+        <div className="flex items-center justify-between p-4 border border-stone-700 bg-stone-900">
+          <div>
+            <p className="font-terminal text-sm text-stone-300">Avatar AI abilitato</p>
+            <p className="font-mono text-xs text-stone-600 mt-1">Mostra la pagina /avatar sul sito pubblico</p>
+          </div>
+          <button
+            onClick={() => set("avatar_enabled", !settings.avatar_enabled)}
+            className={`px-4 py-2 font-terminal text-xs border transition-all ${
+              settings.avatar_enabled
+                ? "border-cyan-500 text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20"
+                : "border-stone-700 text-stone-500 hover:border-amber-500 hover:text-amber-400"
+            }`}
+          >
+            {settings.avatar_enabled ? "ATTIVO \u25cf" : "DISATTIVO \u25cb"}
+          </button>
+        </div>
+      </div>
+
+      {/* Personalità Avatar */}
+      <div className="terminal-card p-6">
+        <h3 className="font-terminal text-xs text-cyan-400 mb-5 tracking-widest">{'>'} PERSONALIT\u00c0 AVATAR</h3>
+        <div className="space-y-4">
+          <Field label="NOME AVATAR">
+            <Input value={settings.avatar_name || ""} onChange={(e) => set("avatar_name", e.target.value)} placeholder="Es: Zio Gio AI" />
+          </Field>
+          <Field label="MESSAGGIO DI BENVENUTO">
+            <Textarea value={settings.avatar_greeting || ""} onChange={(e) => set("avatar_greeting", e.target.value)} rows={3} placeholder="Messaggio mostrato all'apertura della chat..." />
+          </Field>
+          <Field label="URL IMMAGINE AVATAR (opzionale)">
+            <Input value={settings.avatar_image_url || ""} onChange={(e) => set("avatar_image_url", e.target.value)} placeholder="https://..." />
+          </Field>
+          {settings.avatar_image_url && (
+            <div className="flex items-center gap-3 p-3 bg-stone-900 border border-stone-700">
+              <img src={settings.avatar_image_url} alt="avatar preview" className="w-14 h-14 object-cover rounded-full border border-cyan-500/30" />
+              <span className="font-terminal text-xs text-stone-500">AVATAR_IMG.preview</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* System Prompt */}
+      <div className="terminal-card p-6">
+        <h3 className="font-terminal text-xs text-amber-400 mb-2 tracking-widest">{'>'} SYSTEM PROMPT (ISTRUZIONI AI)</h3>
+        <p className="font-mono text-xs text-stone-600 mb-4 leading-relaxed">
+          Queste istruzioni definiscono la personalità e il comportamento dell'AI. Non vengono mai esposte agli utenti.
+        </p>
+        <Field label="SYSTEM PROMPT">
+          <Textarea
+            value={settings.avatar_system_prompt || ""}
+            onChange={(e) => set("avatar_system_prompt", e.target.value)}
+            rows={6}
+            placeholder="Sei Zio Gio, un content creator napoletano..."
+          />
+        </Field>
+      </div>
+
+      {/* OpenAI Config */}
+      <div className="terminal-card p-6">
+        <h3 className="font-terminal text-xs text-cyan-400 mb-5 tracking-widest">{'>'} OPENAI CONFIG</h3>
+        <div className="space-y-4">
+          <Field label="OPENAI API KEY">
+            <div className="relative">
+              <input
+                type={showOAKey ? "text" : "password"}
+                value={settings.openai_api_key || ""}
+                onChange={(e) => set("openai_api_key", e.target.value)}
+                className="input-terminal pr-10"
+                placeholder="sk-..."
+              />
+              <button
+                type="button"
+                onClick={() => setShowOAKey(!showOAKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-cyan-400 transition-colors"
+              >
+                {showOAKey ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+            {settings.openai_api_key && (
+              <p className="font-terminal text-[10px] text-green-500 mt-1">\u2713 API key inserita</p>
+            )}
+          </Field>
+          <Field label="MODELLO">
+            <Select
+              value={settings.openai_model || "gpt-4o-mini"}
+              onChange={(e) => set("openai_model", e.target.value)}
+              options={[
+                ["gpt-4o-mini", "GPT-4o Mini (veloce, economico)"],
+                ["gpt-4o", "GPT-4o (pi\u00f9 capace)"],
+                ["gpt-4-turbo", "GPT-4 Turbo"],
+                ["gpt-3.5-turbo", "GPT-3.5 Turbo (pi\u00f9 economico)"],
+              ]}
+            />
+          </Field>
+        </div>
+      </div>
+
+      {/* ElevenLabs Config */}
+      <div className="terminal-card p-6">
+        <h3 className="font-terminal text-xs text-cyan-400 mb-2 tracking-widest">{'>'} ELEVENLABS VOCE (opzionale)</h3>
+        <p className="font-mono text-xs text-stone-600 mb-4">Configura ElevenLabs per far parlare l'avatar con la tua voce clonata.</p>
+        <div className="space-y-4">
+          <Field label="ELEVENLABS API KEY">
+            <div className="relative">
+              <input
+                type={showELKey ? "text" : "password"}
+                value={settings.elevenlabs_api_key || ""}
+                onChange={(e) => set("elevenlabs_api_key", e.target.value)}
+                className="input-terminal pr-10"
+                placeholder="Inserisci la tua API key ElevenLabs..."
+              />
+              <button
+                type="button"
+                onClick={() => setShowELKey(!showELKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-cyan-400 transition-colors"
+              >
+                {showELKey ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+          </Field>
+          <Field label="VOICE ID">
+            <Input
+              value={settings.elevenlabs_voice_id || ""}
+              onChange={(e) => set("elevenlabs_voice_id", e.target.value)}
+              placeholder="Es: EXAVITQu4vr4xnSDxMaL"
+            />
+            <p className="font-terminal text-[10px] text-stone-600 mt-1">
+              Trovalo su elevenlabs.io &rarr; Voice Library &rarr; ID voce
+            </p>
+          </Field>
+        </div>
+      </div>
+
+      {/* Test Chat */}
+      <div className="terminal-card p-6">
+        <h3 className="font-terminal text-xs text-cyan-400 mb-4 tracking-widest">{'>'} TEST AVATAR</h3>
+        <p className="font-mono text-xs text-stone-600 mb-4 leading-relaxed">
+          Salva le impostazioni e testa la connessione con OpenAI inviando un messaggio di prova.
+        </p>
+        <button
+          onClick={handleTest}
+          disabled={testing || !settings.openai_api_key}
+          className="flex items-center gap-2 font-terminal text-xs border border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10 px-4 py-3 transition-colors disabled:opacity-40"
+        >
+          <Cpu size={14} />
+          {testing ? "CONNESSIONE IN CORSO..." : "TESTA AVATAR"}
+        </button>
+        {testResult && (
+          <div className={`mt-4 p-4 border font-mono text-xs leading-relaxed ${
+            testResult.ok ? "border-green-500/40 text-green-400 bg-green-500/5" : "border-red-500/40 text-red-400 bg-red-500/5"
+          }`}>
+            <p className="font-terminal text-[10px] mb-2">{testResult.ok ? "\u2713 RISPOSTA AVATAR" : "\u2717 ERRORE"}</p>
+            <p>{testResult.text}</p>
+          </div>
+        )}
+      </div>
+
+      <button onClick={handleSave} disabled={saving} className="btn-cyber w-full flex items-center justify-center gap-2 py-4">
+        <Save size={14} />
+        {saving ? "SALVATAGGIO IN CORSO..." : "SALVA CONFIG AVATAR"}
+      </button>
+    </div>
+  );
+};
+
 // ─── Messages Section ─────────────────────────────────────────────────────────
 const MessagesSection = ({ showToast }) => {
   const [messages, setMessages] = useState([]);
@@ -1019,6 +1250,7 @@ const DataSection = ({ showToast }) => {
 // ─── Main Admin Panel ─────────────────────────────────────────────────────────
 const SECTIONS = [
   { id: "settings", label: "IMPOSTAZIONI SITO", icon: Settings, desc: "Hero, About, Social, Contatti" },
+  { id: "avatar", label: "AVATAR AI", icon: Cpu, desc: "Configura l'assistente AI interattivo" },
   { id: "blog", label: "BLOG & PROMPT AI", icon: FileText, desc: "Crea e modifica i post" },
   { id: "gallery", label: "GALLERIA", icon: Image, desc: "Gestisci le immagini" },
   { id: "projects", label: "PROGETTI", icon: Layers, desc: "Gestisci i progetti" },
@@ -1042,6 +1274,7 @@ const AdminPanel = () => {
     const props = { showToast };
     switch (activeSection) {
       case "settings": return <SettingsSection {...props} />;
+      case "avatar": return <AvatarSection {...props} />;
       case "blog": return <BlogSection {...props} />;
       case "gallery": return <GallerySection {...props} />;
       case "projects": return <ProjectsSection {...props} />;

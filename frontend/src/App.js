@@ -1,11 +1,11 @@
-import { useEffect, useState, createContext, useContext } from "react";
+import { useEffect, useState, useRef, createContext, useContext } from "react";
 import "@/App.css";
 import AdminPanel from "@/components/AdminPanel";
 import { BrowserRouter, Routes, Route, Link, useLocation, Outlet } from "react-router-dom";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import Lenis from 'lenis';
-import { Instagram, Facebook, Mail, Menu, X, Terminal, Cpu, ScanLine, Zap, Clock, ArrowRight, MessageCircle, Play, Lock } from "lucide-react";
+import { Instagram, Facebook, Mail, Menu, X, Terminal, Cpu, ScanLine, Zap, Clock, ArrowRight, MessageCircle, Play, Lock, Square } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -28,6 +28,11 @@ const DEFAULT_SETTINGS = {
   contact_email: "aiconziogio@gmail.com",
   contact_whatsapp: "+39 329 162 4908",
   footer_text: "ZIO_GIO // AI_STORYTELLER",
+  // Avatar AI (non-sensitive fields only)
+  avatar_enabled: false,
+  avatar_name: "Zio Gio AI",
+  avatar_greeting: "Benvenuto nel terminale temporale. Sono Zio Gio, il tuo narratore AI. Come posso aiutarti nel tuo viaggio tra passato e futuro?",
+  avatar_image_url: "",
 };
 
 const SiteSettingsContext = createContext(DEFAULT_SETTINGS);
@@ -93,6 +98,7 @@ const Navigation = () => {
     { name: "Progetti", path: "/#projects" },
     { name: "Galleria", path: "/gallery" },
     { name: "Prompt_AI", path: "/blog" },
+    { name: "Avatar_AI", path: "/avatar" },
     { name: "Contatti", path: "/#contact" }
   ];
 
@@ -1048,6 +1054,262 @@ const BlogPostPage = () => {
   );
 };
 
+// ─── Avatar AI Page ──────────────────────────────────────────────────────────
+const AvatarPage = () => {
+  useSmoothScroll();
+  const settings = useSiteSettings();
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [requestId, setRequestId] = useState(null);
+  const abortRef = useRef(null);
+  const messagesEndRef = useRef(null);
+  const audioRef = useRef(null);
+  const [playingId, setPlayingId] = useState(null);
+
+  useEffect(() => {
+    if (settings.avatar_greeting) {
+      setMessages([{ role: 'assistant', content: settings.avatar_greeting, id: 'greeting' }]);
+    }
+  }, [settings.avatar_greeting]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!input.trim() || loading) return;
+
+    const userMsg = input.trim();
+    setInput('');
+    setLoading(true);
+
+    const rid = `chat_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    setRequestId(rid);
+
+    const msgHistory = messages.map(m => ({ role: m.role, content: m.content }));
+    setMessages(prev => [...prev, { role: 'user', content: userMsg, id: rid + '_user' }]);
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      const response = await axios.post(`${API}/avatar/chat`, {
+        message: userMsg,
+        history: msgHistory,
+        request_id: rid,
+      }, { signal: controller.signal });
+
+      if (response.data.cancelled) {
+        setMessages(prev => [...prev, { role: 'assistant', content: '// PROCESSO_INTERROTTO', id: rid + '_cancelled' }]);
+      } else {
+        setMessages(prev => [...prev, { role: 'assistant', content: response.data.response, id: rid + '_resp' }]);
+      }
+    } catch (err) {
+      if (axios.isCancel(err) || err.name === 'CanceledError') {
+        setMessages(prev => [...prev, { role: 'assistant', content: "// PROCESSO_INTERROTTO dall'utente.", id: rid + '_stop' }]);
+      } else {
+        const detail = err.response?.data?.detail || 'ERRORE_TRASMISSIONE';
+        setMessages(prev => [...prev, { role: 'assistant', content: `// ERRORE: ${detail}`, id: rid + '_err' }]);
+      }
+    } finally {
+      setLoading(false);
+      setRequestId(null);
+      abortRef.current = null;
+    }
+  };
+
+  const handleStop = async () => {
+    if (abortRef.current) abortRef.current.abort();
+    if (requestId) {
+      try { await axios.post(`${API}/avatar/stop/${requestId}`); } catch {}
+    }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setPlayingId(null);
+    }
+  };
+
+  const handleSpeak = async (msgId, text) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    if (playingId === msgId) { setPlayingId(null); return; }
+
+    const speakRid = `speak_${Date.now()}`;
+    setPlayingId(msgId);
+    try {
+      const response = await axios.post(`${API}/avatar/speak`, {
+        text, request_id: speakRid,
+      }, { responseType: 'blob' });
+      const audioUrl = URL.createObjectURL(response.data);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.onended = () => { setPlayingId(null); URL.revokeObjectURL(audioUrl); };
+      audio.onerror = () => setPlayingId(null);
+      audio.play();
+    } catch { setPlayingId(null); }
+  };
+
+  if (!settings.avatar_enabled) {
+    return (
+      <section className="section pt-32 bg-stone-950" data-testid="avatar-page">
+        <div className="container-custom max-w-2xl">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="label-terminal mb-4">{'>'} AVATAR_AI_TERMINAL</p>
+            <div className="terminal-card p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Cpu size={16} className="text-red-400" />
+                <span className="font-terminal text-xs text-red-400">SISTEMA_OFFLINE</span>
+              </div>
+              <p className="font-mono text-stone-500 text-sm leading-relaxed">
+                L'Avatar AI non è attualmente disponibile.<br />
+                Configura le impostazioni nel pannello admin per attivarlo.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="section pt-32 bg-stone-950" data-testid="avatar-page">
+      <div className="container-custom max-w-3xl">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+          <p className="label-terminal mb-4">{'>'} AVATAR_AI_CHANNEL</p>
+          <div className="flex items-center gap-4 mb-2">
+            {settings.avatar_image_url ? (
+              <div className="w-12 h-12 overflow-hidden border border-cyan-500/40">
+                <img src={settings.avatar_image_url} alt="Avatar" className="w-full h-full object-cover" style={{ filter: 'sepia(30%)' }} />
+              </div>
+            ) : (
+              <div className="w-12 h-12 border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center">
+                <Cpu size={20} className="text-cyan-400" />
+              </div>
+            )}
+            <div>
+              <h1 className="text-2xl md:text-3xl font-typewriter">
+                <span className="text-stone-200">Parla con </span>
+                <span className="text-cyan-400">{settings.avatar_name || 'Zio Gio AI'}</span>
+              </h1>
+              <p className="font-terminal text-[11px] text-stone-600">ENCRYPTED_CHANNEL // TEMPORAL_NODE_07</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="terminal-card" data-testid="avatar-chat-container">
+          <div className="terminal-header">
+            <span className="terminal-dot red" />
+            <span className="terminal-dot yellow" />
+            <span className="terminal-dot green" />
+            <span className="font-terminal text-xs text-stone-500 ml-4">avatar_terminal.exe</span>
+            <span className={`ml-auto font-terminal text-[10px] flex items-center gap-1.5 ${loading ? 'text-amber-400' : 'text-green-500'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full inline-block ${loading ? 'bg-amber-400 animate-pulse' : 'bg-green-500'}`} />
+              {loading ? 'ELABORAZIONE...' : 'ONLINE'}
+            </span>
+          </div>
+
+          {/* Messaggi */}
+          <div className="h-[420px] overflow-y-auto p-5 space-y-4" data-testid="avatar-messages">
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {msg.role === 'assistant' && (
+                  <div className="flex-shrink-0 w-7 h-7 border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center mt-1">
+                    <Cpu size={11} className="text-cyan-400" />
+                  </div>
+                )}
+                <div className={`max-w-[82%] px-4 py-3 font-mono text-sm leading-relaxed ${
+                  msg.role === 'user'
+                    ? 'bg-stone-800 border border-amber-500/30 text-amber-100'
+                    : 'bg-stone-900/80 border border-stone-700 text-stone-300'
+                }`}>
+                  <p className={`font-terminal text-[10px] mb-1 ${msg.role === 'user' ? 'text-amber-500' : 'text-cyan-500'}`}>
+                    {'>'} {msg.role === 'user' ? 'TU' : (settings.avatar_name || 'ZIO_GIO_AI').toUpperCase().replace(/ /g, '_')}
+                  </p>
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  {msg.role === 'assistant' && !msg.content.startsWith('//') && (
+                    <button
+                      onClick={() => handleSpeak(msg.id, msg.content)}
+                      className={`mt-2 flex items-center gap-1 font-terminal text-[10px] transition-colors ${
+                        playingId === msg.id ? 'text-amber-400' : 'text-stone-600 hover:text-cyan-400'
+                      }`}
+                      title="Ascolta risposta (richiede ElevenLabs)"
+                    >
+                      {playingId === msg.id ? <Square size={8} /> : <Play size={8} />}
+                      {playingId === msg.id ? 'STOP_AUDIO' : 'ASCOLTA'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex gap-3 justify-start">
+                <div className="flex-shrink-0 w-7 h-7 border border-cyan-500/40 bg-cyan-500/10 flex items-center justify-center">
+                  <Cpu size={11} className="text-cyan-400 animate-pulse" />
+                </div>
+                <div className="bg-stone-900/80 border border-stone-700 px-4 py-4">
+                  <div className="flex gap-1 items-end h-4">
+                    <span className="w-1 h-2 bg-cyan-500 animate-pulse" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1 h-3 bg-cyan-500 animate-pulse" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1 h-4 bg-cyan-500 animate-pulse" style={{ animationDelay: '300ms' }} />
+                    <span className="w-1 h-3 bg-cyan-500 animate-pulse" style={{ animationDelay: '450ms' }} />
+                    <span className="w-1 h-2 bg-cyan-500 animate-pulse" style={{ animationDelay: '600ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <div className="border-t border-stone-800 p-4">
+            <form onSubmit={handleSend} className="flex gap-2 items-center">
+              <span className="font-terminal text-cyan-500 text-sm flex-shrink-0">{'>'}</span>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={loading}
+                placeholder={`Scrivi a ${settings.avatar_name || 'Zio Gio'}...`}
+                className="flex-1 input-terminal text-sm"
+                data-testid="avatar-input"
+              />
+              {loading ? (
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 font-terminal text-xs border border-red-500 text-red-400 hover:bg-red-500/10 transition-colors"
+                  data-testid="avatar-stop"
+                >
+                  <Square size={10} />
+                  STOP
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="flex-shrink-0 btn-cyber text-xs px-4 py-2"
+                  data-testid="avatar-send"
+                >
+                  INVIA
+                </button>
+              )}
+            </form>
+          </div>
+        </div>
+
+        <p className="font-terminal text-[10px] text-stone-700 mt-4 text-center">
+          POWERED_BY_OPENAI // TEMPORAL_AI_NODE v2.0 // Canale cifrato
+        </p>
+      </div>
+    </section>
+  );
+};
+
 // Main App
 function App() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
@@ -1068,6 +1330,7 @@ function App() {
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
+              <Route path="/avatar" element={<AvatarPage />} />
             </Route>
             <Route path="/admin" element={<AdminPanel />} />
           </Routes>
