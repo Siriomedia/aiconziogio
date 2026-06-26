@@ -363,8 +363,8 @@ const ProjectsSection = () => {
           axios.get(`${API}/instagram`),
           axios.get(`${API}/reels`),
         ]);
-        if (instaRes.status === 'fulfilled') setInstaData(instaRes.value.data);
-        if (reelsRes.status === 'fulfilled') setReels(reelsRes.value.data);
+        if (instaRes.status === 'fulfilled' && instaRes.value.data?.posts) setInstaData(instaRes.value.data);
+        if (reelsRes.status === 'fulfilled' && Array.isArray(reelsRes.value.data)) setReels(reelsRes.value.data);
       } catch {
         // silent fail
       } finally {
@@ -534,7 +534,7 @@ const ProjectsSection = () => {
         )}
 
         {/* ─── Reels salvati ─── */}
-        {reels.length > 0 && (
+        {Array.isArray(reels) && reels.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -816,7 +816,7 @@ const PublicLayout = () => (
 // Home Page
 const HomePage = () => {
   useSmoothScroll();
-  useEffect(() => { axios.post(`${API}/seed`).catch(() => {}); }, []);
+  useEffect(() => { axios.post(`${API}/seed`, {}, { validateStatus: () => true }).catch(() => {}); }, []);
   return (
     <>
       <HeroSection />
@@ -838,7 +838,7 @@ const GalleryPage = () => {
     const fetchGallery = async () => {
       try {
         const response = await axios.get(`${API}/gallery`);
-        setGallery(response.data);
+        if (Array.isArray(response.data)) setGallery(response.data);
       } catch {
         setGallery([
           { id: '1', title: 'Napoli 1955', image_url: 'https://images.unsplash.com/photo-1769690093979-252e3b9a8fac?w=800', category: 'photo', description: 'Ritratto d\'epoca' },
@@ -928,7 +928,7 @@ const BlogPage = () => {
     const fetchPosts = async () => {
       try {
         const response = await axios.get(`${API}/blog`);
-        setPosts(response.data);
+        if (Array.isArray(response.data)) setPosts(response.data);
       } catch {
         setPosts([
           { id: '1', title: 'Il Viaggio di Phileas Fogg', slug: 'phileas-fogg', excerpt: 'Come ricreare l\'epopea vittoriana con l\'AI', prompt_text: 'Victorian gentleman, steam locomotive, sepia tones, 1880s...', image_url: 'https://images.unsplash.com/photo-1768268959053-770212976791?w=800', created_at: new Date().toISOString() },

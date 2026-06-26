@@ -334,7 +334,7 @@ const BlogSection = ({ showToast }) => {
   const fetchPosts = useCallback(async () => {
     try {
       const { data } = await adminApi.get("/blog");
-      setPosts(data);
+      if (Array.isArray(data)) setPosts(data);
     } catch { showToast("Errore caricamento post", "error"); }
     finally { setLoading(false); }
   }, []);
@@ -486,7 +486,7 @@ const GallerySection = ({ showToast }) => {
   const fetchItems = useCallback(async () => {
     try {
       const { data } = await adminApi.get("/gallery");
-      setItems(data);
+      if (Array.isArray(data)) setItems(data);
     } catch { showToast("Errore caricamento galleria", "error"); }
     finally { setLoading(false); }
   }, []);
@@ -624,7 +624,7 @@ const ProjectsSection = ({ showToast }) => {
   const fetchProjects = useCallback(async () => {
     try {
       const { data } = await adminApi.get("/projects");
-      setProjects(data);
+      if (Array.isArray(data)) setProjects(data);
     } catch { showToast("Errore caricamento progetti", "error"); }
     finally { setLoading(false); }
   }, []);
@@ -767,7 +767,7 @@ const ReelsSection = ({ showToast }) => {
   const fetchReels = useCallback(async () => {
     try {
       const { data } = await adminApi.get("/reels");
-      setReels(data);
+      if (Array.isArray(data)) setReels(data);
     } catch { showToast("Errore caricamento reel", "error"); }
     finally { setLoading(false); }
   }, []);
@@ -1148,7 +1148,7 @@ const MessagesSection = ({ showToast }) => {
 
   useEffect(() => {
     adminApi.get("/messages")
-      .then((r) => setMessages(r.data))
+      .then((r) => Array.isArray(r.data) ? setMessages(r.data) : showToast("Risposta non valida dal server", "error"))
       .catch(() => showToast("Errore caricamento messaggi", "error"))
       .finally(() => setLoading(false));
   }, []);
